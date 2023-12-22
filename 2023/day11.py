@@ -18,7 +18,7 @@ galaxies = []
 for y in range(len(grid)):
     for x in range(len(grid[y])):
         if grid[y][x] == '#':
-            galaxies.append(Galaxy(x, y))
+            galaxies.append(Galaxy(y=y, x=x))
 
 empty_rows = [y for y in range(len(grid)) if y not in map(lambda galaxy: galaxy.y, galaxies)]
 empty_cols = [x for x in range(len(grid[0])) if x not in map(lambda galaxy: galaxy.x, galaxies)]
