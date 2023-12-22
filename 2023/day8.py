@@ -1,6 +1,6 @@
+import math
 import re
 import sys
-import time
 
 sequence = list(sys.stdin.readline().strip())
 edges = {}
@@ -22,16 +22,15 @@ print(step)
 
 step = 0
 nodes = [node for node in edges.keys() if node[2] == 'A']
-print(nodes)
-while len([node for node in nodes if node[2] != 'Z']):
+first_finish: list[int | None] = [None for node in nodes]
+
+while len([node for node in first_finish if node is None]):
     for i in range(len(nodes)):
         nodes[i] = edges[nodes[i]][0 if sequence[step % len(sequence)] == 'L' else 1]
+
+        if nodes[i][2] == 'Z' and first_finish[i] is None:
+            first_finish[i] = step + 1
+
     step += 1
 
-    # print(nodes)
-    if nodes[1][2] == 'Z':
-        print(step)
-        time.sleep(1)
-
-# FIXME
-print(step)
+print(math.lcm(*first_finish))
