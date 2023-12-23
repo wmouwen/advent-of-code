@@ -1,15 +1,34 @@
+import re
 import sys
 
 
-def hash_sequence(algorithm: str) -> int:
-    value = 0
+def hash_sequence(plain: str) -> int:
+    hashed = 0
 
-    for char in algorithm:
-        value = ((value + ord(char)) * 17) % 256
+    for char in plain:
+        hashed = ((hashed + ord(char)) * 17) % 256
 
-    return value
+    return hashed
 
 
 init_sequence = sys.stdin.readline().strip().split(',')
 
-print(sum(hash_sequence(algorithm) for algorithm in init_sequence))
+print(sum(hash_sequence(step) for step in init_sequence))
+
+boxes = [{} for i in range(256)]
+for step in init_sequence:
+    lens = re.match(r'^(?P<label>\w+)(?P<operation>[=-])(?P<focal_length>\d+)?$', step)
+    box = hash_sequence(lens["label"])
+
+    if lens["operation"] == "=":
+        boxes[box][lens["label"]] = int(lens["focal_length"])
+    else:
+        if lens["label"] in boxes[box]:
+            boxes[box].pop(lens["label"])
+
+score = 0
+for b, box in enumerate(boxes, start=1):
+    for l, lens in enumerate(box, start=1):
+        score += b * l * box[lens]
+
+print(score)
