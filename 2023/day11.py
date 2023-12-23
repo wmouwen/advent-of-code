@@ -1,35 +1,21 @@
 import sys
 from collections import namedtuple
 
-Galaxy = namedtuple('Galaxy', ['y', 'x'])
+Galaxy = namedtuple('Galaxy', 'x y')
 
 
-def distance(a: Galaxy, b: Galaxy, empty_rows: list[int], empty_cols: list[int]) -> int:
+def dist(a: Galaxy, b: Galaxy, empty_rows: list[int], empty_cols: list[int], multiplier: int) -> int:
     return (abs(a.x - b.x)
             + abs(a.y - b.y)
-            + sum(1 for row in empty_rows if min(a.y, b.y) < row < max(a.y, b.y))
-            + sum(1 for col in empty_cols if min(a.x, b.x) < col < max(a.x, b.x))
+            + sum(multiplier - 1 for row in empty_rows if min(a.y, b.y) < row < max(a.y, b.y))
+            + sum(multiplier - 1 for col in empty_cols if min(a.x, b.x) < col < max(a.x, b.x))
             )
 
 
 grid = [line.strip() for line in sys.stdin]
-galaxies = []
+galaxies = [Galaxy(x=x, y=y) for y, row in enumerate(grid) for x, cell in enumerate(row) if cell == '#']
+empty_rows = [y for y, row in enumerate(grid) if all(cell != '#' for cell in row)]
+empty_cols = [x for x, col in enumerate(zip(*grid)) if all(cell != '#' for cell in col)]
 
-for y in range(len(grid)):
-    for x in range(len(grid[y])):
-        if grid[y][x] == '#':
-            galaxies.append(Galaxy(y=y, x=x))
-
-empty_rows = [y for y in range(len(grid)) if y not in map(lambda galaxy: galaxy.y, galaxies)]
-empty_cols = [x for x in range(len(grid[0])) if x not in map(lambda galaxy: galaxy.x, galaxies)]
-
-total_distance = 0
-
-for i in range(len(galaxies) - 1):
-    for j in range(i + 1, len(galaxies)):
-        assert i != j
-
-        total_distance += distance(galaxies[i], galaxies[j], empty_rows=empty_rows, empty_cols=empty_cols)
-
-# TODO FIXME something is off
-print(total_distance)
+print(sum(dist(a, b, empty_rows, empty_cols, 2) for i, a in enumerate(galaxies) for b in galaxies[:i]))
+print(sum(dist(a, b, empty_rows, empty_cols, 1000000) for i, a in enumerate(galaxies) for b in galaxies[:i]))
