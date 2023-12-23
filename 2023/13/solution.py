@@ -1,6 +1,6 @@
 import sys
 
-Pattern = list[str]
+Pattern = list[list[str]]
 
 
 def find_reflection(pattern: Pattern, smudges: int) -> int:
