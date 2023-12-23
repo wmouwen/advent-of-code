@@ -22,13 +22,7 @@ for step in init_sequence:
 
     if lens["operation"] == "=":
         boxes[box][lens["label"]] = int(lens["focal_length"])
-    else:
-        if lens["label"] in boxes[box]:
-            boxes[box].pop(lens["label"])
+    elif lens["label"] in boxes[box]:
+        boxes[box].pop(lens["label"])
 
-score = 0
-for b, box in enumerate(boxes, start=1):
-    for l, lens in enumerate(box, start=1):
-        score += b * l * box[lens]
-
-print(score)
+print(sum(b * l * box[lens] for b, box in enumerate(boxes, start=1) for l, lens in enumerate(box, start=1)))
