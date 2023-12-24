@@ -1,17 +1,13 @@
 import sys
+from functools import reduce
 
-rucksacks = []
-part1 = 0
 
-for line in sys.stdin:
-    stripped = line.strip()
-    rucksacks.append(stripped)
+def score(rucksacks) -> int:
+    intersection = reduce(lambda a, b: set(a) & set(b), rucksacks)
+    return sum(ord(c) - ord('a') + 1 if 'a' <= c <= 'z' else ord(c) - ord('A') + 27 for c in intersection)
 
-    intersection = set(stripped[:len(stripped) >> 1]) & set(stripped[len(stripped) >> 1:])
-    for char in intersection:
-        if 'a' <= char <= 'z':
-            part1 += ord(char) - ord('a') + 1
-        else:
-            part1 += ord(char) - ord('A') + 27
 
-print(part1)
+rucksacks = [line.strip() for line in sys.stdin]
+
+print(sum(score([rucksack[:len(rucksack) >> 1], rucksack[len(rucksack) >> 1:]]) for rucksack in rucksacks))
+print(sum(score(rucksacks[3 * i:3 * (i + 1)]) for i in range(len(rucksacks) // 3)))
