@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <cstdint>
 
 const int IMGWIDTH = 25;
 const int IMGHEIGHT = 6;
