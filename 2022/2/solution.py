@@ -1,10 +1,15 @@
 import sys
 
-games: list[tuple] = []
+part1 = 0
+part2 = 0
 
 for line in sys.stdin:
-    opponent, self = line.strip().split(' ')
-    games.append((ord(opponent) - ord('A'), ord(self) - ord('X')))
+    a, b = line.strip().split(' ')
+    left = ord(a) - ord('A')
+    right = ord(b) - ord('X')
 
-print(sum(3 * ((game[1] - game[0] + 1) % 3) + game[1] + 1 for game in games))
-print(sum(3 * game[1] + ((game[0] + game[1] - 1) % 3) + 1 for game in games))
+    part1 += 3 * ((right - left + 1) % 3) + right + 1
+    part2 += 3 * right + ((left + right - 1) % 3) + 1
+
+print(part1)
+print(part2)
