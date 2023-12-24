@@ -96,7 +96,7 @@ foreach ($particles as $particle) {
     }
 }
 
-usort($particles, function (Particle &$a, Particle &$b) {
+usort($particles, function (Particle $a, Particle $b) {
     return $a->getDistance() <=> $b->getDistance();
 });
 
