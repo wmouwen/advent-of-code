@@ -2,7 +2,7 @@
 
 $memory = array_map('intval', explode("\t", trim(fgets(STDIN))));
 
-$visited = new Ds\Map;
+$visited = [];
 
 $steps = 0;
 
@@ -15,11 +15,13 @@ for ($steps = 1; true; $steps++) {
         $memory[$index % count($memory)]++;
     }
 
-    if ($visited->hasKey($memory)) {
+    $hash = md5(serialize($memory));
+
+    if (array_key_exists($hash, $visited)) {
         fwrite(STDOUT, $steps . PHP_EOL);
-        fwrite(STDOUT, ($steps - $visited->get($memory)) . PHP_EOL);
+        fwrite(STDOUT, ($steps - $visited[$hash]) . PHP_EOL);
         break;
     }
 
-    $visited->put($memory, $steps);
+    $visited[$hash] = $steps;
 }
