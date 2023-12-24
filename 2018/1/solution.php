@@ -9,8 +9,8 @@ $changes = [];
 /** @var int|null $firstRevisit The first frequency to be revisited. */
 $firstRevisit = null;
 
-/** @var Ds\Set $visited List of visited frequencies. */
-$visited = new Ds\Set;
+/** @var list<int> $visited List of visited frequencies. */
+$visited = [];
 
 /** @var string $row */
 while ($row = trim(fgets(STDIN))) {
@@ -25,10 +25,10 @@ while ($row = trim(fgets(STDIN))) {
     $frequency += $change;
 
     // Detect revisits.
-    if ($visited->contains($frequency)) {
+    if (in_array($frequency, $visited)) {
         $firstRevisit = $firstRevisit ?? $frequency;
     } else {
-        $visited->add($frequency);
+        $visited[] = $frequency;
     }
 }
 
@@ -41,12 +41,12 @@ while ($firstRevisit === null) {
         $frequency += $change;
 
         // Detect revisits. Break on the first revisit.
-        if ($visited->contains($frequency)) {
+        if (in_array($frequency, $visited)) {
             $firstRevisit = $frequency;
             break;
         }
 
-        $visited->add($frequency);
+        $visited[] = $frequency;
     }
 }
 
