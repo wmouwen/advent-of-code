@@ -1,56 +1,43 @@
 import sys
+from collections import namedtuple
 
-grid_size = 700
 
-trenches: list[list[str]] = [[' ' for x in range(grid_size)] for y in range(grid_size)]
-x = y = grid_size // 2
+def surface(corners) -> int:
+    area = 0
+    boundary_length = 0
 
-trenches[y][x] = True
+    for i in range(len(corners) - 1):
+        area += corners[i].x * corners[i + 1].y - corners[i].y * corners[i + 1].x
+        boundary_length += abs(corners[i + 1].x + corners[i + 1].y - (corners[i].x + corners[i].y))
+
+    return (area + boundary_length) // 2 + 1
+
+
+Coord = namedtuple('Coord', 'x y')
+
+corners_part1 = [Coord(x=0, y=0)]
+corners_part2 = [Coord(x=0, y=0)]
 
 for line in sys.stdin:
-    direction, length, color = line.split(' ')
+    direction, length, color = line.strip().split(' ')
 
-    for i in range(int(length)):
-        if direction == 'U':
-            y -= 1
-        if direction == 'D':
-            y += 1
-        if direction == 'R':
-            x += 1
-        if direction == 'L':
-            x -= 1
+    if direction == 'R':
+        corners_part1.append(Coord(x=corners_part1[-1].x + int(length), y=corners_part1[-1].y))
+    if direction == 'D':
+        corners_part1.append(Coord(x=corners_part1[-1].x, y=corners_part1[-1].y + int(length)))
+    if direction == 'L':
+        corners_part1.append(Coord(x=corners_part1[-1].x - int(length), y=corners_part1[-1].y))
+    if direction == 'U':
+        corners_part1.append(Coord(x=corners_part1[-1].x, y=corners_part1[-1].y - int(length)))
 
-        if not 0 < x < grid_size - 1 or not 0 < y < grid_size - 1:
-            raise RuntimeError('Grid size inadequate')
+    if color[-2] == '0':
+        corners_part2.append(Coord(x=corners_part2[-1].x + int(color[2:-2], 16), y=corners_part2[-1].y))
+    if color[-2] == '1':
+        corners_part2.append(Coord(x=corners_part2[-1].x, y=corners_part2[-1].y + int(color[2:-2], 16)))
+    if color[-2] == '2':
+        corners_part2.append(Coord(x=corners_part2[-1].x - int(color[2:-2], 16), y=corners_part2[-1].y))
+    if color[-2] == '3':
+        corners_part2.append(Coord(x=corners_part2[-1].x, y=corners_part2[-1].y - int(color[2:-2], 16)))
 
-        trenches[y][x] = '#'
-
-trenches[0][0] = '.'
-todo = [(0, 0)]
-
-while len(todo):
-    y, x = todo.pop()
-    if trenches[y][x] == '#':
-        continue
-
-    if y < grid_size - 1 and trenches[y + 1][x] == ' ':
-        trenches[y + 1][x] = '.'
-        todo.append((y + 1, x))
-    if y > 0 and trenches[y - 1][x] == ' ':
-        trenches[y - 1][x] = '.'
-        todo.append((y - 1, x))
-    if x < grid_size - 1 and trenches[y][x + 1] == ' ':
-        trenches[y][x + 1] = '.'
-        todo.append((y, x + 1))
-    if x > 0 and trenches[y][x - 1] == ' ':
-        trenches[y][x - 1] = '.'
-        todo.append((y, x - 1))
-
-total_size = 0
-for y, row in enumerate(trenches):
-    for x, cell in enumerate(row):
-        if cell in ['#', ' ']:
-            total_size += 1
-
-print(total_size)
-# TODO Part 2 requires an algorithm to calculate surface instead of using a floodfill approach.
+print(surface(corners_part1))
+print(surface(corners_part2))
