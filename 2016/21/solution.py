@@ -1,13 +1,9 @@
+import itertools
 import sys
 
 
-def scramble(input: str, instructions: list[list[str]]) -> str:
-    password: list[str] = list(input)
-
+def scramble(password: list[str], instructions: list[list[str]]) -> str:
     for instr in instructions:
-        print(''.join(password))
-        print(instr)
-
         if instr[0] == "swap" and instr[1] == "position":
             tmp = password[int(instr[2])]
             password[int(instr[2])] = password[int(instr[5])]
@@ -19,15 +15,12 @@ def scramble(input: str, instructions: list[list[str]]) -> str:
             password[tmp] = instr[5]
 
         elif instr[0] == "rotate" and instr[1] in ["left", "right"]:
-            # TODO FIX
-            index = int(instr[2])
-            if instr[1] == "right":
-                index = len(password) - index
+            index = int(instr[2]) if instr[1] == "left" else len(password) - int(instr[2])
             password = password[index:] + password[:index]
 
         elif instr[0] == "rotate" and instr[1] == "based":
-            # TODO FIX
-            index = len(password) - (password.index(instr[6]))
+            index = password.index(instr[6])
+            index = len(password) - (index + 1 if index >= 4 else index)
             password = password[-1:] + password[:-1]
             password = password[index:] + password[:index]
 
@@ -37,8 +30,7 @@ def scramble(input: str, instructions: list[list[str]]) -> str:
             password = password[:x] + list(reversed(password[x:y])) + password[y:]
 
         elif instr[0] == "move":
-            index = int(instr[2])
-            letter = password[index]
+            letter = password[int(instr[2])]
             password.remove(letter)
             password.insert(int(instr[5]), letter)
 
@@ -46,4 +38,13 @@ def scramble(input: str, instructions: list[list[str]]) -> str:
 
 
 instructions = [line.strip().split(' ') for line in sys.stdin]
-print(scramble('abcde', instructions))
+
+result = scramble(list('abcdefgh'), instructions)
+print(result)
+
+for permutation in itertools.permutations('abcdefgh'):
+    result = scramble(list(permutation), instructions)
+
+    if result == 'fbgdceah':
+        print(''.join(permutation))
+        break
