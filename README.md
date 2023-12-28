@@ -3,8 +3,8 @@
 This repository contains a set of solutions to the problems published by [Eric Wastl](https://github.com/topaz) for his
 yearly [Advent of Code](https://adventofcode.com/) event.
 
-The repository contains a mixture of different programming languages used including C++, Java, PHP and Python. Solutions are
-made to read from `stdin` and output to `stdout`.
+The repository contains a mixture of different programming languages used including C++, Java, PHP and Python. Solutions
+are made to read from `stdin` and output to `stdout`.
 
 ## Stars
 
@@ -18,4 +18,4 @@ made to read from `stdin` and output to `stdout`.
 | 2020 | ** | ** | ** | ** | ** | ** | ** | ** | ** | ** |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
 | 2021 | ** | ** | ** | ** | ** | ** | ** | ** | ** | ** | ** | ** | ** | ** | ** |    | ** |    |    |    |    |    |    |    |    |
 | 2022 | ** | ** | ** | ** | ** | ** | ** | ** |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
-| 2023 | ** | ** | ** | ** | *  | ** | ** | ** | ** | ** | ** |    | ** | ** | ** |    |    | ** |    |    |    |    |    |    |    |
+| 2023 | ** | ** | ** | ** | ** | ** | ** | ** | ** | ** | ** |    | ** | ** | ** |    |    | ** |    |    |    |    |    |    |    |
