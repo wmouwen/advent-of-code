@@ -1,5 +1,7 @@
+import math
 import re
 import sys
+from queue import Queue
 from typing import NamedTuple
 
 
@@ -10,18 +12,7 @@ class Rule(NamedTuple):
     target: str
 
 
-class Part(NamedTuple):
-    x: int
-    m: int
-    a: int
-    s: int
-
-    @property
-    def rating(self):
-        return self.x + self.m + self.a + self.s
-
-
-def is_accepted(part: Part) -> bool:
+def is_accepted(part: dict[str, int]) -> bool:
     current_rule = 'in'
 
     while current_rule not in ['A', 'R']:
@@ -31,7 +22,7 @@ def is_accepted(part: Part) -> bool:
                 break
 
             assert isinstance(rule, Rule)
-            ref = getattr(part, rule.category)
+            ref = part[rule.category]
             if (rule.operator == '>' and ref > rule.threshold) or (rule.operator == '<' and ref < rule.threshold):
                 current_rule = rule.target
                 break
@@ -57,14 +48,59 @@ for line in sys.stdin:
         else:
             workflows[name].append(rule)
 
-parts = []
+sum_ratings = 0
 for line in sys.stdin:
     match = re.match(r'^\{x=(?P<x>\d+),m=(?P<m>\d+),a=(?P<a>\d+),s=(?P<s>\d+)}$', line.strip())
-    parts.append(Part(
-        x=int(match.group('x')),
-        m=int(match.group('m')),
-        a=int(match.group('a')),
-        s=int(match.group('s'))
-    ))
+    part = {'x': int(match.group('x')),
+            'm': int(match.group('m')),
+            'a': int(match.group('a')),
+            's': int(match.group('s'))}
 
-print(sum(part.rating for part in parts if is_accepted(part)))
+    if is_accepted(part):
+        sum_ratings += sum(part.values())
+print(sum_ratings)
+
+combinations = 0
+queue = Queue()
+queue.put(({'x': (1, 4000), 'm': (1, 4000), 'a': (1, 4000), 's': (1, 4000)}, 'in'))
+
+while not queue.empty():
+    part, name = queue.get()
+
+    if name == 'A':
+        combinations += math.prod(map(lambda cat: cat[1] - cat[0] + 1, part.values()))
+    elif name != 'R':
+        for rule in workflows[name]:
+            if isinstance(rule, Rule):
+                if rule.operator == '<':
+                    if rule.threshold <= part[rule.category][0]:
+                        # Condition not met
+                        continue
+                    if rule.threshold <= part[rule.category][1]:
+                        # Condition partially met
+                        new_part = part.copy()
+                        new_part[rule.category] = (part[rule.category][0], rule.threshold - 1)
+                        queue.put((new_part, rule.target))
+                        part[rule.category] = (rule.threshold, part[rule.category][1])
+                        continue
+                    # Condition fully met
+                    queue.put((part, rule.target))
+                    break
+                if rule.operator == '>':
+                    if rule.threshold >= part[rule.category][1]:
+                        # Condition not met
+                        continue
+                    if rule.threshold >= part[rule.category][0]:
+                        # Condition partially met
+                        new_part = part.copy()
+                        new_part[rule.category] = (rule.threshold + 1, part[rule.category][1])
+                        queue.put((new_part, rule.target))
+                        part[rule.category] = (part[rule.category][0], rule.threshold)
+                        continue
+                    # Condition fully met
+                    queue.put((part, rule.target))
+                    break
+
+            queue.put((part, rule))
+
+print(combinations)
