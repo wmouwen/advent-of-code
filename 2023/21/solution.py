@@ -16,7 +16,7 @@ class Vector(NamedTuple):
         ]
 
 
-Grid = list[list]
+Grid = list[list[str | int | None]]
 
 
 def find_start(grid: Grid) -> Vector:
@@ -29,7 +29,7 @@ def find_start(grid: Grid) -> Vector:
 
 
 def flood_fill(grid: Grid) -> Grid:
-    distances = [[None for _ in row] for row in grid]
+    distances: Grid = [[None for _ in row] for row in grid]
     queue = Queue()
 
     start = find_start(grid)
@@ -50,6 +50,21 @@ def flood_fill(grid: Grid) -> Grid:
 
 
 grid = [list(line.strip()) for line in sys.stdin]
-
 distances = flood_fill(grid)
-print(sum(1 for row in distances for distance in row if distance is not None and distance <= 64 and not distance % 2))
+
+total_even = sum(1 for row in distances for steps in row if steps is not None and not steps % 2)
+inner_even = sum(1 for row in distances for steps in row if steps is not None and steps <= 64 and not steps % 2)
+corners_even = total_even - inner_even
+
+total_odd = sum(1 for row in distances for steps in row if steps is not None and steps % 2)
+inner_odd = sum(1 for row in distances for steps in row if steps is not None and steps <= 65 and steps % 2)
+corners_odd = total_odd - inner_odd
+
+max_steps = 26501365
+diamond_radius = (max_steps - len(grid) // 2) // len(grid)
+full_even_grids = diamond_radius ** 2
+full_odd_grids = (diamond_radius + 1) ** 2
+
+print(inner_even)
+print((full_even_grids * total_even + diamond_radius * corners_even
+       + full_odd_grids * total_odd - (diamond_radius + 1) * corners_odd))
