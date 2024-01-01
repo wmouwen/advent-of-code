@@ -52,12 +52,12 @@ def flood_fill(grid: Grid) -> Grid:
 grid = [list(line.strip()) for line in sys.stdin]
 distances = flood_fill(grid)
 
-total_even = sum(1 for row in distances for steps in row if steps is not None and not steps % 2)
-inner_even = sum(1 for row in distances for steps in row if steps is not None and steps <= 64 and not steps % 2)
+total_even = sum(1 for row in distances for cell in row if cell is not None and not cell % 2)
+inner_even = sum(1 for row in distances for cell in row if cell is not None and not cell % 2 and cell <= len(grid) // 2)
 corners_even = total_even - inner_even
 
-total_odd = sum(1 for row in distances for steps in row if steps is not None and steps % 2)
-inner_odd = sum(1 for row in distances for steps in row if steps is not None and steps <= 65 and steps % 2)
+total_odd = sum(1 for row in distances for cell in row if cell is not None and cell % 2)
+inner_odd = sum(1 for row in distances for cell in row if cell is not None and cell % 2 and cell <= len(grid) // 2)
 corners_odd = total_odd - inner_odd
 
 max_steps = 26501365
