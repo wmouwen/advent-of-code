@@ -1,6 +1,11 @@
+import math
 import re
 import sys
 from typing import NamedTuple
+
+
+def matmul(a: list[list], b: list[list]):
+    return [[sum(p * q for p, q in zip(a_row, b_col)) for b_col in zip(*b)] for a_row in a]
 
 
 class Vector(NamedTuple):
@@ -17,35 +22,53 @@ movements = {
 directions = list(movements.keys())
 
 
+class Waypoint:
+    def __init__(self, dx: int, dy: int):
+        self.dx = dx
+        self.dy = dy
+
+
 class Ship:
     def __init__(self):
         self.x = 0
         self.y = 0
         self.direction = 'E'
+        self.waypoint = Waypoint(dx=10, dy=-1)
 
-    def move_direction(self, direction: str, velocity: int):
+    def rotate(self, degrees: int):
+        self.direction = directions[(directions.index(self.direction) + int(degrees // 90)) % len(directions)]
+        for _ in range(int(degrees // 90) % 4):
+            self.waypoint.dx, self.waypoint.dy = -1 * self.waypoint.dy, self.waypoint.dx
+
+    def move_to_direction(self, direction: str, velocity: int):
         self.x += velocity * movements[direction].x
         self.y += velocity * movements[direction].y
 
-    def rotate(self, velocity: int):
-        self.direction = directions[(directions.index(self.direction) + int(velocity)) % len(directions)]
+    def move_to_waypoint(self, velocity: int):
+        self.x += velocity * self.waypoint.dx
+        self.y += velocity * self.waypoint.dy
+
+    def move_waypoint(self, direction: str, velocity: int):
+        self.waypoint.dx += velocity * movements[direction].x
+        self.waypoint.dy += velocity * movements[direction].y
 
 
-instructions = []
+ship1, ship2 = Ship(), Ship()
 for line in sys.stdin:
     action, velocity = re.match(r'(\w)(\d+)', line).groups()
-    instructions.append((action, int(velocity)))
 
-ship = Ship()
-
-for action, velocity in instructions:
     if action in movements:
-        ship.move_direction(direction=action, velocity=velocity)
+        ship1.move_to_direction(direction=action, velocity=int(velocity))
+        ship2.move_waypoint(direction=action, velocity=int(velocity))
     elif action == 'F':
-        ship.move_direction(direction=ship.direction, velocity=velocity)
+        ship1.move_to_direction(direction=ship1.direction, velocity=int(velocity))
+        ship2.move_to_waypoint(velocity=int(velocity))
     elif action == 'R':
-        ship.rotate(velocity=velocity // 90)
+        ship1.rotate(degrees=int(velocity))
+        ship2.rotate(degrees=int(velocity))
     elif action == 'L':
-        ship.rotate(velocity=-1 * (velocity // 90))
+        ship1.rotate(degrees=-1 * int(velocity))
+        ship2.rotate(degrees=-1 * int(velocity))
 
-print(abs(ship.x) + abs(ship.y))
+print(abs(ship1.x) + abs(ship1.y))
+print(abs(ship2.x) + abs(ship2.y))
