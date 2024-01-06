@@ -1,11 +1,6 @@
-import math
 import re
 import sys
 from typing import NamedTuple
-
-
-def matmul(a: list[list], b: list[list]):
-    return [[sum(p * q for p, q in zip(a_row, b_col)) for b_col in zip(*b)] for a_row in a]
 
 
 class Vector(NamedTuple):
