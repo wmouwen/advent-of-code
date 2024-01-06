@@ -6,12 +6,12 @@ $state = str_split($input[1]);
 // Catch blank line.
 fgets(STDIN);
 
-$rules = new Ds\Map;
+$rules = [];
 while (preg_match('/^(.*?)\s=>\s(.*?)$/', trim(fgets(STDIN)), $input)) {
-    $rules->put(str_split($input[1]), $input[2]);
+    $rules[implode('|', str_split($input[1]))] = $input[2];
 }
 
-function evolve(array &$state, Ds\Map &$rules)
+function evolve(array &$state, array &$rules)
 {
     $oldKeys = array_keys($state);
     $new = [];
@@ -21,7 +21,7 @@ function evolve(array &$state, Ds\Map &$rules)
         for ($dx = -2; $dx <= 2; $dx++) {
             $key[] = $state[$x + $dx] ?? '.';
         }
-        $new[$x] = $rules->get($key);
+        $new[$x] = $rules[implode('|', $key)];
     }
 
     return $new;
