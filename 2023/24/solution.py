@@ -1,12 +1,13 @@
-import re
-import sys
 from typing import Self, NamedTuple
+import re
+from sympy import Symbol, solve_poly_system
+import sys
 
 
 class Vector(NamedTuple):
-    x: int
-    y: int
-    z: int = None
+    x: int | Symbol
+    y: int | Symbol
+    z: int | Symbol = None
 
 
 class Hailstone:
@@ -31,15 +32,15 @@ class Hailstone:
         return self.velocity.y / self.velocity.x
 
     @property
-    def xy_offset(self) -> float:
+    def xy_y_intercept(self) -> float:
         return self.start.y - self.start.x * self.xy_slope
 
     def xy_intersection(self, other: Self) -> Vector | None:
         if self.xy_slope == other.xy_slope:
             return None
 
-        x = (other.xy_offset - self.xy_offset) / (self.xy_slope - other.xy_slope)
-        y = self.xy_slope * x + self.xy_offset
+        x = (other.xy_y_intercept - self.xy_y_intercept) / (self.xy_slope - other.xy_slope)
+        y = self.xy_slope * x + self.xy_y_intercept
 
         return Vector(x=x, y=y)
 
@@ -47,22 +48,44 @@ class Hailstone:
         return 0 <= (point.x - self.start.x) / self.velocity.x
 
 
-test_area = (200000000000000, 400000000000000)
 hailstones = [Hailstone.from_str(line.strip()) for line in sys.stdin]
-intersections = 0
 
-for i, stone in enumerate(hailstones):
+test_area = (200000000000000, 400000000000000)
+if len(hailstones) == 5:
+    test_area = (7, 27)
+
+intersections = 0
+for i, hailstone in enumerate(hailstones):
     for other in hailstones[:i]:
-        intersection = stone.xy_intersection(other)
+        intersection = hailstone.xy_intersection(other)
         if intersection is None:
             continue
 
         if not test_area[0] <= intersection.x <= test_area[1] or not test_area[0] <= intersection.y <= test_area[1]:
             continue
 
-        if not stone.in_future(intersection) or not other.in_future(intersection):
+        if not hailstone.in_future(intersection) or not other.in_future(intersection):
             continue
 
         intersections += 1
 
 print(intersections)
+
+rock = Hailstone(
+    start=Vector(Symbol('x'), Symbol('y'), Symbol('z')),
+    velocity=Vector(Symbol('vx'), Symbol('vy'), Symbol('vz'))
+)
+
+variables = [*rock.start, *rock.velocity]
+equations = []
+
+for hailstone in hailstones[:3]:
+    variables.append(time := Symbol(f'hailstone_{id(hailstone)}'))
+    equations.extend([
+        (rock.start.x + rock.velocity.x * time) - (hailstone.start.x + hailstone.velocity.x * time),
+        (rock.start.y + rock.velocity.y * time) - (hailstone.start.y + hailstone.velocity.y * time),
+        (rock.start.z + rock.velocity.z * time) - (hailstone.start.z + hailstone.velocity.z * time)
+    ])
+
+solved_system = solve_poly_system(equations, variables)
+print(sum(solved_system[0][:3]))
