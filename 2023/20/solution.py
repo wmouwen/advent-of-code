@@ -86,8 +86,11 @@ for name, module in modules.items():
             modules[destination].add_source(name)
 
 pulses = {Pulse.LOW: 0, Pulse.HIGH: 0}
+button_press = 0
 
-for button_press in range(1000):
+while True:
+    button_press += 1
+
     queue = Queue()
     queue.put(('button', Pulse.LOW, 'broadcaster'))
 
@@ -97,14 +100,16 @@ for button_press in range(1000):
 
         # print(f"{source} -{pulse.value}-> {destination}")
 
+        if destination == 'rx' and pulse == Pulse.LOW:
+            print(button_press)
+            exit(0)
+
         output = modules[destination].trigger(source, pulse)
         if output is not None:
             for next_destination in modules[destination].destinations:
                 queue.put((destination, output, next_destination))
 
-print(math.prod(pulses.values()))
+    if button_press == 1000:
+        print(math.prod(pulses.values()))
 
-for module in modules.values():
-    module.reset()
-
-# TODO part 2
+# TODO Optimize.
