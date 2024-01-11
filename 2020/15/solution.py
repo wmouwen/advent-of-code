@@ -1,24 +1,22 @@
 import sys
 
 
-def spoken_in_turn(turn: int, numbers: list[int]) -> int:
-    numbers.reverse()
+def spoken_in_turn(turns: int, numbers: list[int]) -> int:
+    last_occurrence = dict((number, turn + 1) for turn, number in enumerate(numbers[:-1]))
+    previous = numbers[-1]
+    turn = len(numbers)
 
-    while len(numbers) < turn:
-        number: int = numbers[0]
+    while turn < turns:
+        offset = turn - last_occurrence[previous] if previous in last_occurrence else 0
 
-        try:
-            previous = numbers.index(number, 1)
-            numbers.insert(0, previous)
-        except ValueError:
-            numbers.insert(0, 0)
+        last_occurrence[previous] = turn
+        previous = offset
+        turn += 1
 
-    return numbers[0]
+    return previous
 
 
-numbers: list[int] = list(map(int, sys.stdin.readline().strip().split(',')))
+numbers = list(map(int, sys.stdin.readline().strip().split(',')))
 
-print(spoken_in_turn(turn=2020, numbers=numbers.copy()))
-
-# TODO Optimize; keep track of previous position in dict, don't keep on searching a full list.
-print(spoken_in_turn(turn=30000000, numbers=numbers.copy()))
+print(spoken_in_turn(turns=2020, numbers=numbers.copy()))
+print(spoken_in_turn(turns=30000000, numbers=numbers.copy()))
