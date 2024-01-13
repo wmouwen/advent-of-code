@@ -15,16 +15,16 @@ def main():
         output_callback=lambda value: output.append(value)
     )
     computer.run()
-    print(output[-1])
+    print(output[0])
 
     output = []
     computer = IntcodeComputer(
         program=program,
-        input_callback=lambda: 5,
+        input_callback=lambda: 2,
         output_callback=lambda value: output.append(value)
     )
     computer.run()
-    print(output[-1])
+    print(output[0])
 
 
 if __name__ == '__main__':

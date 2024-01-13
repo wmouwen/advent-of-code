@@ -6,21 +6,21 @@ from intcode import IntcodeComputer, ParameterMode
 
 
 def main():
-    input_csv = sys.stdin.readline().strip()
+    program = list(map(int, sys.stdin.readline().strip().split(',')))
 
-    program = IntcodeComputer(program=list(map(int, input_csv.split(','))))
-    program.write(addr=0x01, value=12)
-    program.write(addr=0x02, value=2)
-    program.run()
-    print(program.read(0x00, ParameterMode.IMMEDIATE))
+    computer = IntcodeComputer(program=program)
+    computer.write(addr=0x01, value=12)
+    computer.write(addr=0x02, value=2)
+    computer.run()
+    print(computer.read(0x00, ParameterMode.IMMEDIATE))
 
     for attempt in range(0, 10000):
-        program = IntcodeComputer(program=list(map(int, input_csv.split(','))))
-        program.write(addr=0x01, value=attempt // 100)
-        program.write(addr=0x02, value=attempt % 100)
+        computer = IntcodeComputer(program=program)
+        computer.write(addr=0x01, value=attempt // 100)
+        computer.write(addr=0x02, value=attempt % 100)
 
-        program.run()
-        if program.read(0x00, ParameterMode.IMMEDIATE) == 19690720:
+        computer.run()
+        if computer.read(0x00, ParameterMode.IMMEDIATE) == 19690720:
             print(attempt)
             break
 
