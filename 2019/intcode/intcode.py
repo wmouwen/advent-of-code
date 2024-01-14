@@ -1,6 +1,5 @@
 from enum import Enum
-from typing import Callable, Self
-from unittest import case
+from typing import Callable
 
 
 class ParameterMode(Enum):
@@ -9,9 +8,21 @@ class ParameterMode(Enum):
     RELATIVE = 2
 
 
+class Opcode(Enum):
+    ADD = 1
+    MUL = 2
+    IN = 3
+    OUT = 4
+    JNZ = 5
+    JZ = 6
+    LT = 7
+    EQ = 8
+    RB = 9
+    EXIT = 99
+
+
 MemoryAddress = int
 Instruction = int
-Opcode = int
 Memory = dict[int, Instruction | int]
 
 InputCallback = Callable[[], int]
@@ -30,8 +41,12 @@ def split_instruction(instruction: Instruction) -> tuple[Opcode, list[ParameterM
 
 
 class IntcodeComputer:
-    def __init__(self, program: list[Instruction | int], input_callback: InputCallback = None,
-                 output_callback: OutputCallback = None):
+    def __init__(
+            self,
+            program: list[Instruction | int],
+            input_callback: InputCallback = None,
+            output_callback: OutputCallback = None
+    ):
         self.memory: Memory = dict(zip(range(len(program)), program))
         self.input_callback: InputCallback = input_callback
         self.output_callback: OutputCallback = output_callback
@@ -69,68 +84,61 @@ class IntcodeComputer:
         while True:
             opcode, modes = split_instruction(self.read(self.ip, ParameterMode.IMMEDIATE))
 
-            # print("---", self.ip, self.read(self.ip, ParameterMode.IMMEDIATE))
-            # print(self.read(1000, ParameterMode.IMMEDIATE))
-
             match opcode:
-                case 1:
+                case Opcode.ADD:
                     self.write(
                         addr=self.read(self.ip + 0x03, modes[2], target_write=True),
                         value=self.read(self.ip + 0x01, modes[0]) + self.read(self.ip + 0x02, modes[1])
                     )
                     self.ip += 0x04
 
-                case 2:
+                case Opcode.MUL:
                     self.write(
                         addr=self.read(self.ip + 0x03, modes[2], target_write=True),
                         value=self.read(self.ip + 0x01, modes[0]) * self.read(self.ip + 0x02, modes[1])
                     )
                     self.ip += 0x04
 
-                case 3:
+                case Opcode.IN:
                     self.write(
                         addr=self.read(self.ip + 0x01, modes[0], target_write=True),
                         value=self.input_callback()
                     )
                     self.ip += 0x02
 
-                case 4:
+                case Opcode.OUT:
                     self.output_callback(self.read(self.ip + 0x01, modes[0]))
                     self.ip += 0x02
 
-                case 5:
+                case Opcode.JNZ:
                     if self.read(self.ip + 0x01, modes[0]) != 0:
                         self.ip = self.read(self.ip + 0x02, modes[1])
                     else:
                         self.ip += 0x03
 
-                case 6:
+                case Opcode.JZ:
                     if self.read(self.ip + 0x01, modes[0]) == 0:
                         self.ip = self.read(self.ip + 0x02, modes[1])
                     else:
                         self.ip += 0x03
 
-                case 7:
+                case Opcode.LT:
                     self.write(
                         addr=self.read(self.ip + 0x03, modes[2], target_write=True),
                         value=self.read(self.ip + 0x01, modes[0]) < self.read(self.ip + 0x02, modes[1])
                     )
                     self.ip += 0x04
 
-                case 8:
+                case Opcode.EQ:
                     self.write(
                         addr=self.read(self.ip + 0x03, modes[2], target_write=True),
                         value=self.read(self.ip + 0x01, modes[0]) == self.read(self.ip + 0x02, modes[1])
                     )
                     self.ip += 0x04
 
-                case 9:
+                case Opcode.RB:
                     self.relative_base += self.read(self.ip + 0x01, modes[0])
                     self.ip += 0x02
 
-                case 99:
-                    # End of program
+                case Opcode.EXIT:
                     return
-
-                case _:
-                    self.ip += 0x01
