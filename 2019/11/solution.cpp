@@ -7,6 +7,8 @@
 #include <deque>
 #include <map>
 #include <algorithm>
+#include <cstdint>
+#include <limits>
 
 using namespace std;
 
@@ -225,7 +227,7 @@ int main() {
             whites = set<Coordinate>{Coordinate(0, 0)}
     );
 
-    long xMin = INT32_MAX, yMin = INT32_MAX, xMax = INT32_MIN, yMax = INT32_MIN;
+    long xMin = std::numeric_limits<std::int32_t>::max(), yMin = std::numeric_limits<std::int32_t>::max(), xMax = std::numeric_limits<std::int32_t>::min(), yMax = std::numeric_limits<std::int32_t>::min();
     for (auto &coordinate: whites) {
         xMin = min(xMin, coordinate.first);
         yMin = min(yMin, coordinate.second);
