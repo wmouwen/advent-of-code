@@ -1,4 +1,6 @@
+import itertools
 import sys
+from queue import Queue
 from typing import Self
 
 
@@ -11,8 +13,11 @@ class Vector:
 
 class Brick:
     def __init__(self, top: Vector, bottom: Vector):
+        self.id = '?'
         self.top = top
         self.bottom = bottom
+        self.supporting: list[Self] = []
+        self.supported_by: list[Self] = []
 
     @classmethod
     def from_str(cls, definition: str) -> Self:
@@ -41,45 +46,25 @@ class Brick:
 
 
 bricks = [Brick.from_str(line.strip()) for line in sys.stdin]
+for i, brick in enumerate(bricks):
+    brick.id = chr(ord('A') + i)
 bricks.sort(key=lambda brick: brick.distance_to_ground)
 
 for i, brick in enumerate(bricks):
     if brick.distance_to_ground == 0:
         continue
 
-    fall_distance = brick.distance_to_ground
+    brick.fall(min(
+        brick.distance_to_ground,
+        *(brick.bottom.z - other.top.z - 1 for other in bricks[:i] if other.is_beneath(brick))
+    ))
 
-    for other in bricks[:i]:
-        if other.is_beneath(brick):
-            fall_distance = min(fall_distance, brick.bottom.z - other.top.z - 1)
+for a, b in itertools.combinations(bricks, 2):
+    assert isinstance(a, Brick) and isinstance(b, Brick)
 
-    brick.fall(fall_distance)
+    if a.supports(b):
+        a.supporting.append(b)
+        b.supported_by.append(a)
 
-bricks.sort(key=lambda brick: brick.distance_to_ground)
-
-safe_to_remove_count = 0
-for i, brick in enumerate(bricks):
-    safe_to_remove = True
-
-    for j, other in enumerate(bricks):
-        if brick == other:
-            continue
-
-        if brick.supports(other):
-            safe_to_remove = False
-
-            for k, third in enumerate(bricks):
-                if brick == third or other == third:
-                    continue
-
-                if third.supports(other):
-                    safe_to_remove = True
-                    break
-
-            if not safe_to_remove:
-                break
-
-    if safe_to_remove:
-        safe_to_remove_count += 1
-
-print(safe_to_remove_count)
+safe_to_remove = sum(all(len(other.supported_by) != 1 for other in brick.supporting) for brick in bricks)
+print(safe_to_remove)
