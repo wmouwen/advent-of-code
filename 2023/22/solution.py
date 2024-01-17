@@ -13,11 +13,10 @@ class Vector:
 
 class Brick:
     def __init__(self, top: Vector, bottom: Vector):
-        self.id = '?'
         self.top = top
         self.bottom = bottom
-        self.supporting: list[Self] = []
-        self.supported_by: list[Self] = []
+        self.supporting: set[Self] = set()
+        self.supported_by: set[Self] = set()
 
     @classmethod
     def from_str(cls, definition: str) -> Self:
@@ -45,26 +44,52 @@ class Brick:
         return self.is_beneath(other) and self.top.z == other.bottom.z - 1
 
 
-bricks = [Brick.from_str(line.strip()) for line in sys.stdin]
-for i, brick in enumerate(bricks):
-    brick.id = chr(ord('A') + i)
-bricks.sort(key=lambda brick: brick.distance_to_ground)
+def main():
+    bricks = [Brick.from_str(line.strip()) for line in sys.stdin]
+    bricks.sort(key=lambda brick: brick.distance_to_ground)
 
-for i, brick in enumerate(bricks):
-    if brick.distance_to_ground == 0:
-        continue
+    for i, brick in enumerate(bricks):
+        if brick.distance_to_ground == 0:
+            continue
 
-    brick.fall(min(
-        brick.distance_to_ground,
-        *(brick.bottom.z - other.top.z - 1 for other in bricks[:i] if other.is_beneath(brick))
-    ))
+        brick.fall(min(
+            sys.maxsize,
+            brick.distance_to_ground,
+            *(brick.bottom.z - other.top.z - 1 for other in bricks[:i] if other.is_beneath(brick))
+        ))
 
-for a, b in itertools.combinations(bricks, 2):
-    assert isinstance(a, Brick) and isinstance(b, Brick)
+    for a, b in itertools.combinations(bricks, r=2):
+        assert isinstance(a, Brick) and isinstance(b, Brick)
 
-    if a.supports(b):
-        a.supporting.append(b)
-        b.supported_by.append(a)
+        if a.supports(b):
+            a.supporting.add(b)
+            b.supported_by.add(a)
 
-safe_to_remove = sum(all(len(other.supported_by) != 1 for other in brick.supporting) for brick in bricks)
-print(safe_to_remove)
+    safe_to_remove = sum(all(len(other.supported_by) != 1 for other in brick.supporting) for brick in bricks)
+    print(safe_to_remove)
+
+    disintegrating_sum = 0
+    for brick in bricks:
+        chain_reaction = {brick}
+
+        queue: Queue[Brick] = Queue()
+        for other in brick.supporting:
+            queue.put(other)
+
+        while not queue.empty():
+            other = queue.get()
+
+            if len(other.supported_by - chain_reaction) > 0:
+                continue
+
+            chain_reaction.add(other)
+            for third in other.supporting:
+                queue.put(third)
+
+        disintegrating_sum += len(chain_reaction) - 1
+
+    print(disintegrating_sum)
+
+
+if __name__ == '__main__':
+    main()
