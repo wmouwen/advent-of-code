@@ -65,24 +65,18 @@ def build_graph(grid, start: Vector, goal: Vector) -> Graph:
     return graph
 
 
-# TODO Convert to recursive method, improve memory efficiency.
-def find_longest_path(graph: Graph, start: Vector, goal: Vector) -> int:
+def find_longest_path(graph: Graph, goal: Vector, current: Vector, distance: int, visited: list[Node]) -> int:
+    if current == goal:
+        return distance
+
     longest = 0
+    visited.append(graph[current])
 
-    queue = Queue()
-    queue.put((start, {start}, 0))
+    for next_node, weight in graph[current].edges.items():
+        if next_node not in visited:
+            longest = max(longest, find_longest_path(graph, goal, next_node.location, distance + weight, visited))
 
-    while not queue.empty():
-        current, visited, distance = queue.get()
-
-        if current == goal and distance > longest:
-            longest = distance
-            print('>', longest)
-            continue
-
-        for next, weight in graph[current].edges.items():
-            if not next in visited:
-                queue.put((next.location, visited.union({next.location}), distance + weight))
+    visited.remove(graph[current])
 
     return longest
 
@@ -98,14 +92,14 @@ def main():
     #     for other, weight in node.edges.items():
     #         print('->', other.location, weight)
 
-    print(find_longest_path(graph, start, goal))
+    print(find_longest_path(graph, goal, start, 0, []))
 
     for node in graph.values():
         for other, weight in node.edges.items():
             other.edges[node] = weight
 
     previous_to_last_node, last_edge_weight = next(iter(graph[goal].edges.items()))
-    print(find_longest_path(graph, start, previous_to_last_node.location) + last_edge_weight)
+    print(find_longest_path(graph, previous_to_last_node.location, start, 0, []) + last_edge_weight)
 
 
 if __name__ == '__main__':
