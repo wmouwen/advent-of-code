@@ -1,10 +1,13 @@
 from copy import deepcopy
+from typing import NamedTuple, Callable
 
 MemoryAddress = str
 Instruction = list[str]
 Registers = dict[MemoryAddress, int]
 
-tgl_map = {
+OutputCallback = Callable[[int], None]
+
+TOGGLE_MAP = {
     'inc': 'dec',
     'dec': 'inc',
     'tgl': 'inc',
@@ -14,15 +17,28 @@ tgl_map = {
 }
 
 
+class DetectedFunction(NamedTuple):
+    target: MemoryAddress
+    result: int
+    registers_to_clear: list[MemoryAddress]
+    skip: int
+
+
 def is_numeric(arg: str) -> bool:
     return arg.lstrip('-').isnumeric()
 
 
 class AssembunnyComputer:
-    def __init__(self, instructions: list[Instruction]):
-        self._registers: Registers = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
+    def __init__(self, instructions: list[Instruction], output_callback: OutputCallback = None):
         self._instructions: list[Instruction] = deepcopy(instructions)
+        self._output_callback: OutputCallback = output_callback
+
+        self._registers: Registers = {}
         self._ip: int = 0x00
+        self._interrupted: bool = False
+
+    def interrupt(self) -> None:
+        self._interrupted = True
 
     def write(self, addr: MemoryAddress, value: int) -> None:
         self._registers[addr] = value
@@ -36,56 +52,61 @@ class AssembunnyComputer:
     def _read_arg(self, argument: str) -> int:
         return int(argument) if is_numeric(argument) else self.read(argument)
 
-    def _is_addition(self, ip: int) -> bool:
-        if not 0 <= ip < len(self._instructions) - 2:
-            return False
+    def _detect_addition(self, instructions: list[Instruction], offset: int) -> DetectedFunction | None:
+        if not 0 <= offset <= len(instructions) - 3:
+            return None
 
-        instructions = self._instructions[ip:ip + 3]
+        instructions = instructions[offset:offset + 3]
 
-        return (instructions[0][0] == 'inc' and
+        if (instructions[0][0] == 'inc' and
                 instructions[1][0] == 'dec' and
-                instructions[2] == ['jnz', instructions[1][1], '-2'])
+                instructions[2] == ['jnz', instructions[1][1], '-2']):
+            return DetectedFunction(
+                target=instructions[0][1],
+                result=self.read(instructions[1][1]),
+                registers_to_clear=[instructions[1][1]],
+                skip=3 - 1
+            )
 
-    def _is_multiplication(self, ip) -> bool:
-        if not 0 <= ip < len(self._instructions) - 5:
-            return False
+        return None
 
-        instructions = self._instructions[ip:ip + 6]
+    def _detect_multiplication(self, instructions: list[Instruction], offset: int) -> DetectedFunction | None:
+        if not 0 <= offset <= len(instructions) - 6:
+            return None
 
-        return (instructions[0][0] == 'cpy' and
+        instructions = instructions[offset:offset + 6]
+
+        if (instructions[0][0] == 'cpy' and
                 instructions[1][0] == 'inc' and
                 instructions[2] == ['dec', instructions[0][2]] and
                 instructions[3] == ['jnz', instructions[0][2], '-2'] and
                 instructions[4][0] == 'dec' and
-                instructions[5] == ['jnz', instructions[4][1], '-5'])
+                instructions[5] == ['jnz', instructions[4][1], '-5']):
+            return DetectedFunction(
+                target=instructions[1][1],
+                result=self._read_arg(instructions[0][1]) * self.read(instructions[5][1]),
+                registers_to_clear=[instructions[0][2], instructions[5][1]],
+                skip=6 - 1
+            )
 
-    def run(self):
-        while 0 <= self._ip < len(self._instructions):
-            if self._is_multiplication(self._ip):
-                target = self._instructions[self._ip + 1][1]
-                factors = [
-                    self._read_arg(self._instructions[self._ip][1]),
-                    self.read(self._instructions[self._ip + 5][1])
-                ]
+        return None
 
-                self.write(target, self.read(target) + factors[0] * factors[1])
-                self.write(self._instructions[self._ip][2], 0)
-                self.write(self._instructions[self._ip + 5][1], 0)
+    def run(self) -> None:
+        while not self._interrupted and 0 <= self._ip < len(self._instructions):
+            if multiplication := self._detect_multiplication(self._instructions, self._ip):
+                self.write(multiplication.target, self.read(multiplication.target) + multiplication.result)
+                for register in multiplication.registers_to_clear:
+                    self.write(register, 0)
+                self._ip += multiplication.skip
 
-                self._ip += 5
-
-            elif self._is_addition(self._ip):
-                target = self._instructions[self._ip][1]
-                addition = self.read(self._instructions[self._ip + 1][1])
-
-                self.write(target, self.read(target) + addition)
-                self.write(self._instructions[self._ip + 1][1], 0)
-
-                self._ip += 2
+            elif addition := self._detect_addition(self._instructions, self._ip):
+                self.write(addition.target, self.read(addition.target) + addition.result)
+                for register in addition.registers_to_clear:
+                    self.write(register, 0)
+                self._ip += addition.skip
 
             else:
                 instruction, *args = self._instructions[self._ip]
-
                 match instruction:
                     case 'cpy':
                         if not is_numeric(args[1]):
@@ -107,7 +128,7 @@ class AssembunnyComputer:
                         target = self._ip + self._read_arg(args[0])
 
                         if 0 <= target < len(self._instructions):
-                            self._instructions[target][0] = tgl_map[self._instructions[target][0]]
+                            self._instructions[target][0] = TOGGLE_MAP[self._instructions[target][0]]
 
                     case 'out':
                         # TODO: 2016 day 25
