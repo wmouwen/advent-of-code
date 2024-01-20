@@ -8,11 +8,12 @@ from assembunny import AssembunnyComputer
 def main():
     instructions = [line.strip().split(' ') for line in sys.stdin]
     computer = AssembunnyComputer(instructions)
+    computer.write('a', 7)
     computer.run()
     print(computer.read('a'))
 
     computer = AssembunnyComputer(instructions)
-    computer.write('c', 1)
+    computer.write('a', 12)
     computer.run()
     print(computer.read('a'))
 

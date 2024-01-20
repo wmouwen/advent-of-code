@@ -1,46 +1,73 @@
-MemoryAddress = int
+from copy import deepcopy
+
+MemoryAddress = str
 Instruction = list[str]
-Registers = dict[str, int]
+Registers = dict[MemoryAddress, int]
+
+tgl_map = {
+    'inc': 'dec',
+    'dec': 'inc',
+    'tgl': 'inc',
+    'out': 'inc',
+    'jnz': 'cpy',
+    'cpy': 'jnz'
+}
+
+
+def is_numeric(arg: str) -> bool:
+    return arg.lstrip('-').isnumeric()
 
 
 class AssembunnyComputer:
     def __init__(self, instructions: list[Instruction]):
-        self.registers: Registers = dict()
-        self.instructions: list[Instruction] = instructions
+        self._registers: Registers = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
+        self._instructions: list[Instruction] = deepcopy(instructions)
+        self._ip: int = 0x00
 
-        self.ip: MemoryAddress = 0x00
+    def write(self, addr: MemoryAddress, value: int) -> None:
+        self._registers[addr] = value
 
-    def argval(self, argument: str) -> int:
-        if argument.lstrip('-').isnumeric():
-            return int(argument)
+    def read(self, addr: MemoryAddress) -> int:
+        if addr not in self._registers.keys():
+            self._registers[addr] = 0
 
-        if argument not in self.registers.keys():
-            self.registers[argument] = 0
+        return self._registers[addr]
 
-        return self.registers[argument]
+    def _read_arg(self, argument: str) -> int:
+        return int(argument) if is_numeric(argument) else self.read(argument)
 
     def run(self):
-        while 0 <= self.ip < len(self.instructions):
-            instruction, *args = self.instructions[self.ip]
+        while 0 <= self._ip < len(self._instructions):
+            instruction, *args = self._instructions[self._ip]
 
             match instruction:
                 case 'cpy':
-                    self.registers[args[1]] = self.argval(args[0])
+                    if not is_numeric(args[1]):
+                        self.write(args[1], self._read_arg(args[0]))
 
                 case 'inc':
-                    if args[0] not in self.registers.keys():
-                        self.registers[args[0]] = 0
-
-                    self.registers[args[0]] += 1
+                    if not is_numeric(args[0]):
+                        self.write(args[0], self.read(args[0]) + 1)
 
                 case 'dec':
-                    if args[0] not in self.registers.keys():
-                        self.registers[args[0]] = 0
-
-                    self.registers[args[0]] -= 1
+                    if not is_numeric(args[0]):
+                        self.write(args[0], self.read(args[0]) - 1)
 
                 case 'jnz':
-                    if self.argval(args[0]) != 0:
-                        self.ip += self.argval(args[1]) - 1
+                    if self._read_arg(args[0]) != 0:
+                        self._ip += self._read_arg(args[1]) - 1
 
-            self.ip += 1
+                case 'tgl':
+                    target = self._ip + self._read_arg(args[0])
+
+                    if 0 <= target < len(self._instructions):
+                        self._instructions[target][0] = tgl_map[self._instructions[target][0]]
+
+                case 'out':
+                    # TODO: 2016 day 25
+                    pass
+
+                case _:
+                    raise Exception('Unhandled instruction')
+
+            self._ip += 1

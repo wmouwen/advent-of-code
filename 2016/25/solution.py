@@ -8,13 +8,7 @@ from assembunny import AssembunnyComputer
 def main():
     instructions = [line.strip().split(' ') for line in sys.stdin]
     computer = AssembunnyComputer(instructions)
-    computer.run()
-    print(computer.read('a'))
-
-    computer = AssembunnyComputer(instructions)
-    computer.write('c', 1)
-    computer.run()
-    print(computer.read('a'))
+    # TODO
 
 
 if __name__ == '__main__':
