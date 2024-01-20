@@ -44,9 +44,7 @@ class AssembunnyComputer:
 
         return (instructions[0][0] == 'inc' and
                 instructions[1][0] == 'dec' and
-                instructions[2][0] == 'jnz' and
-                instructions[2][2] == '-2' and
-                instructions[1][1] == instructions[2][1])
+                instructions[2] == ['jnz', instructions[1][1], '-2'])
 
     def _is_multiplication(self, ip) -> bool:
         if not 0 <= ip < len(self._instructions) - 5:
@@ -55,37 +53,39 @@ class AssembunnyComputer:
         instructions = self._instructions[ip:ip + 6]
 
         return (instructions[0][0] == 'cpy' and
-                self._is_addition(ip + 1) and
-                instructions[0][2] == instructions[2][1] and
+                instructions[1][0] == 'inc' and
+                instructions[2] == ['dec', instructions[0][2]] and
+                instructions[3] == ['jnz', instructions[0][2], '-2'] and
                 instructions[4][0] == 'dec' and
-                instructions[5][0] == 'jnz' and
-                instructions[5][2] == '-5' and
-                instructions[4][1] == instructions[5][1])
+                instructions[5] == ['jnz', instructions[4][1], '-5'])
 
     def run(self):
         while 0 <= self._ip < len(self._instructions):
-            instruction, *args = self._instructions[self._ip]
-
             if self._is_multiplication(self._ip):
-                left = self._read_arg(self._instructions[self._ip][1])
-                right = self.read(self._instructions[self._ip + 5][1])
-                self.write(
-                    self._instructions[self._ip + 1][1],
-                    self.read(self._instructions[self._ip + 1][1]) + left * right
-                )
+                target = self._instructions[self._ip + 1][1]
+                factors = [
+                    self._read_arg(self._instructions[self._ip][1]),
+                    self.read(self._instructions[self._ip + 5][1])
+                ]
+
+                self.write(target, self.read(target) + factors[0] * factors[1])
                 self.write(self._instructions[self._ip][2], 0)
                 self.write(self._instructions[self._ip + 5][1], 0)
+
                 self._ip += 5
 
             elif self._is_addition(self._ip):
-                self.write(
-                    self._instructions[self._ip][1],
-                    self.read(self._instructions[self._ip][1]) + self.read(self._instructions[self._ip + 1][1])
-                )
+                target = self._instructions[self._ip][1]
+                addition = self.read(self._instructions[self._ip + 1][1])
+
+                self.write(target, self.read(target) + addition)
                 self.write(self._instructions[self._ip + 1][1], 0)
+
                 self._ip += 2
 
             else:
+                instruction, *args = self._instructions[self._ip]
+
                 match instruction:
                     case 'cpy':
                         if not is_numeric(args[1]):
