@@ -40,6 +40,7 @@ def main():
     # slot: 7 left, 14 up, 13 right
     # data: 34 steps left
     # slot: 33 circle movements, 4 steps each, around data
+    # TODO convert to computed result.
     print(7 + 14 + 14 + 34 + 4 * 33)
 
 
