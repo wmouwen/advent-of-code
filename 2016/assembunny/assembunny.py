@@ -65,7 +65,7 @@ class AssembunnyComputer:
                 target=instructions[0][1],
                 result=self.read(instructions[1][1]),
                 registers_to_clear=[instructions[1][1]],
-                skip=3 - 1
+                skip=3
             )
 
         return None
@@ -86,7 +86,7 @@ class AssembunnyComputer:
                 target=instructions[1][1],
                 result=self._read_arg(instructions[0][1]) * self.read(instructions[5][1]),
                 registers_to_clear=[instructions[0][2], instructions[5][1]],
-                skip=6 - 1
+                skip=6
             )
 
         return None
@@ -97,13 +97,13 @@ class AssembunnyComputer:
                 self.write(multiplication.target, self.read(multiplication.target) + multiplication.result)
                 for register in multiplication.registers_to_clear:
                     self.write(register, 0)
-                self._ip += multiplication.skip
+                self._ip += multiplication.skip - 1
 
             elif addition := self._detect_addition(self._instructions, self._ip):
                 self.write(addition.target, self.read(addition.target) + addition.result)
                 for register in addition.registers_to_clear:
                     self.write(register, 0)
-                self._ip += addition.skip
+                self._ip += addition.skip - 1
 
             else:
                 instruction, *args = self._instructions[self._ip]
@@ -131,8 +131,7 @@ class AssembunnyComputer:
                             self._instructions[target][0] = TOGGLE_MAP[self._instructions[target][0]]
 
                     case 'out':
-                        # TODO: 2016 day 25
-                        pass
+                        self._output_callback(self._read_arg(args[0]))
 
                     case _:
                         raise Exception('Unhandled instruction')
