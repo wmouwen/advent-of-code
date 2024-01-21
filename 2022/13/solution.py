@@ -1,4 +1,4 @@
-import ast
+import json
 import math
 import sys
 from functools import cmp_to_key
@@ -40,7 +40,7 @@ for line in sys.stdin:
     if not line:
         continue
 
-    lines.append(ast.literal_eval(line))
+    lines.append(json.loads(line))
 
     if not len(lines) % 2:
         if compare_order(lines[-2], lines[-1]) == 1:
