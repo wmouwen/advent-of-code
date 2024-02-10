@@ -1,4 +1,5 @@
 import sys
+from sympy.ntheory.modular import crt
 
 
 def main():
@@ -22,6 +23,18 @@ def main():
             earliest_departure_delay = delay
 
     print(earliest_departure_bus * earliest_departure_delay)
+
+    modulos = []
+    remainders = []
+
+    for offset, bus in enumerate(busses):
+        if bus is None:
+            continue
+
+        modulos.append(bus)
+        remainders.append((-1 * offset) % bus)
+
+    print(crt(modulos, remainders)[0])
 
 
 if __name__ == '__main__':
