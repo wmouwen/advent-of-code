@@ -33,23 +33,19 @@ def resource_value(grid):
 
 def main():
     grid = [[field for field in line.strip()] for line in sys.stdin.readlines()]
-    # print('Initial state:', *[''.join(row) for row in grid], '', sep="\n")
 
     visited = dict()
     tick = 0
     while tick < 1000000000:
         tick += 1
         grid = evolve(grid)
-        # print('After {} minutes:'.format(tick), *[''.join(row) for row in grid], '', sep="\n")
 
         if tick == 10:
             print(resource_value(grid))
 
         hash = ''.join([''.join(row) for row in grid])
         if hash in visited:
-            # print('HIT', tick, visited[hash], tick - visited[hash], 1000000000 // (tick - visited[hash]))
-            tick += (tick - visited[hash]) * (1000000000 // (tick - visited[hash]))
-            # TODO Broken
+            tick += (tick - visited[hash]) * ((1000000000 - tick) // (tick - visited[hash]))
 
         visited[hash] = tick
 
