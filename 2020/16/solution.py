@@ -1,3 +1,4 @@
+import math
 import re
 import sys
 
@@ -9,6 +10,9 @@ class Rule:
 
     def passes(self, value: int) -> bool:
         return any(rule_range[0] <= value <= rule_range[1] for rule_range in self.ranges)
+
+    def __repr__(self) -> str:
+        return self.field
 
 
 class Ticket:
@@ -36,8 +40,37 @@ def main():
     print(sum(ticket.sum_invalid(rules) for ticket in nearby_tickets))
 
     valid_nearby_tickets = [ticket for ticket in nearby_tickets if not ticket.sum_invalid(rules)]
+    candidate_order = [rules.copy() for _ in your_ticket.fields]
 
-    # TODO
+    # TODO Filter fields which exist in just 1 candidate field
+    for index, field_rules in enumerate(candidate_order):
+        for rule in field_rules:
+            if any(not rule.passes(ticket.fields[index]) for ticket in valid_nearby_tickets):
+                field_rules.remove(rule)
+
+    while any(len(field_rules) > 1 for field_rules in candidate_order):
+        assigned = [
+            field_rule
+            for field_rules in candidate_order
+            if len(field_rules) == 1
+            for field_rule in field_rules
+        ]
+
+        for field_rules in candidate_order:
+            if len(field_rules) <= 1:
+                continue
+
+            for rule in assigned:
+                if rule in field_rules:
+                    field_rules.remove(rule)
+
+    field_order = [field_rule for field_rules in candidate_order for field_rule in field_rules]
+
+    print(math.prod(
+        value
+        for index, value in enumerate(your_ticket.fields)
+        if field_order[index].field.startswith('departure')
+    ))
 
 
 if __name__ == '__main__':
