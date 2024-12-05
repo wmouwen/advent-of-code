@@ -1,5 +1,4 @@
 import functools
-import re
 import sys
 from math import floor
 
@@ -30,9 +29,9 @@ def main():
         sorted_update = sorted(update, key=functools.cmp_to_key(compare))
 
         if update == sorted_update:
-            sorted_sum += update[floor(len(update)/2)]
+            sorted_sum += update[floor(len(update) / 2)]
         else:
-            unsorted_sum += sorted_update[floor(len(update)/2)]
+            unsorted_sum += sorted_update[floor(len(update) / 2)]
 
     print(sorted_sum)
     print(unsorted_sum)
