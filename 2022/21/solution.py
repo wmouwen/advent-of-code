@@ -43,7 +43,8 @@ def main():
     monkeys['root'].operator = '='
     for yell in range(0, sys.maxsize):
         monkeys['humn'] = yell
-        if monkeys['root'].value(monkeys):
+
+        if monkeys['root'].value(monkeys) == 1:
             print(yell)
             return
 
