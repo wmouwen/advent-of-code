@@ -7,7 +7,7 @@ from device import Device, Operation
 
 
 def main():
-    device = Device()
+    device = Device(register_count=4)
 
     opcodes = [{operation for operation in Operation}] * 16
     three_or_more_candidates_count = 0
@@ -54,7 +54,7 @@ def main():
 
     opcode_map = {opcode: list(candidates)[0] for opcode, candidates in enumerate(opcodes)}
 
-    device = Device()
+    device = Device(register_count=4)
     for line in sys.stdin:
         if match := re.match(r'^(-?\d+) (-?\d+) (-?\d+) (-?\d+)$', line.strip()):
             operation = opcode_map[int(match.group(1))]

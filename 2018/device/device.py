@@ -24,41 +24,62 @@ type Instruction = (Operation, int, int, int)
 
 
 class Device:
-    registers: list[int] = [0, 0, 0, 0]
+    registers: list[int]
 
-    def execute(self, operation: Operation | str, a: int, b: int, c: int):
-        match operation.value if isinstance(operation, Operation) else operation:
-            case Operation.addr.value:
+    _instructions: list[Instruction]
+    _instruction_pointer: int = 0
+    _bind_instruction_pointer: int
+
+    def __init__(self, register_count: int, instructions: list[Instruction] = None, ip_register: int = None):
+        self.registers = [0] * register_count
+        self._instructions = instructions if instructions is not None else []
+        self._bind_instruction_pointer = ip_register
+
+    def run(self):
+        while 0 <= self._instruction_pointer < len(self._instructions):
+            if self._bind_instruction_pointer is not None:
+                self.registers[self._bind_instruction_pointer] = self._instruction_pointer
+
+            # print(self.registers, self._instructions[self._instruction_pointer], self._instruction_pointer)
+            self.execute(*self._instructions[self._instruction_pointer])
+
+            if self._bind_instruction_pointer is not None:
+                self._instruction_pointer = self.registers[self._bind_instruction_pointer]
+            self._instruction_pointer += 1
+
+    def execute(self, operation: Operation, a: int, b: int, c: int):
+        match operation:
+            case Operation.addr:
                 self.registers[c] = self.registers[a] + self.registers[b]
-            case Operation.addi.value:
+            case Operation.addi:
                 self.registers[c] = self.registers[a] + b
-            case Operation.mulr.value:
+            case Operation.mulr:
                 self.registers[c] = self.registers[a] * self.registers[b]
-            case Operation.muli.value:
+            case Operation.muli:
                 self.registers[c] = self.registers[a] * b
-            case Operation.banr.value:
+            case Operation.banr:
                 self.registers[c] = self.registers[a] & self.registers[b]
-            case Operation.bani.value:
+            case Operation.bani:
                 self.registers[c] = self.registers[a] & b
-            case Operation.borr.value:
+            case Operation.borr:
                 self.registers[c] = self.registers[a] | self.registers[b]
-            case Operation.bori.value:
+            case Operation.bori:
                 self.registers[c] = self.registers[a] | b
-            case Operation.setr.value:
+            case Operation.setr:
                 self.registers[c] = self.registers[a]
-            case Operation.seti.value:
+            case Operation.seti:
                 self.registers[c] = a
-            case Operation.gtir.value:
+            case Operation.gtir:
                 self.registers[c] = int(a > self.registers[b])
-            case Operation.gtri.value:
+            case Operation.gtri:
                 self.registers[c] = int(self.registers[a] > b)
-            case Operation.gtrr.value:
+            case Operation.gtrr:
                 self.registers[c] = int(self.registers[a] > self.registers[b])
-            case Operation.eqir.value:
+            case Operation.eqir:
                 self.registers[c] = int(a == self.registers[b])
-            case Operation.eqri.value:
+            case Operation.eqri:
                 self.registers[c] = int(self.registers[a] == b)
-            case Operation.eqrr.value:
+            case Operation.eqrr:
                 self.registers[c] = int(self.registers[a] == self.registers[b])
             case _:
                 raise Exception(f'Unknown operation: "{operation}"')
