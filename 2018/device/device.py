@@ -22,6 +22,12 @@ class Operation(Enum):
 
 type Instruction = (Operation, int, int, int)
 
+class LoopException(Exception):
+    pass
+
+class ExecutionsExceededException(Exception):
+    pass
+
 
 class Device:
     registers: list[int]
@@ -30,12 +36,21 @@ class Device:
     _instruction_pointer: int = 0
     _bind_instruction_pointer: int
 
-    def __init__(self, register_count: int, instructions: list[Instruction] = None, ip_register: int = None):
+    executions: int = 0
+
+    def __init__(
+            self,
+            register_count: int,
+            instructions: list[Instruction] = None,
+            ip_register: int = None
+    ):
         self.registers = [0] * register_count
         self._instructions = instructions if instructions is not None else []
         self._bind_instruction_pointer = ip_register
 
-    def run(self):
+    def run(self, break_on_loop: bool = False, max_executions: int = None):
+        state_history = set()
+
         while 0 <= self._instruction_pointer < len(self._instructions):
             if self._bind_instruction_pointer is not None:
                 self.registers[self._bind_instruction_pointer] = self._instruction_pointer
@@ -47,7 +62,18 @@ class Device:
                 self._instruction_pointer = self.registers[self._bind_instruction_pointer]
             self._instruction_pointer += 1
 
+            if break_on_loop:
+                state = (self._instruction_pointer, *self.registers)
+                if state in state_history:
+                    raise LoopException()
+                state_history.add(state)
+
+            if max_executions is not None and self.executions >= max_executions:
+                raise ExecutionsExceededException()
+
     def execute(self, operation: Operation, a: int, b: int, c: int):
+        self.executions += 1
+
         match operation:
             case Operation.addr:
                 self.registers[c] = self.registers[a] + self.registers[b]
