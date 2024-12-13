@@ -2,42 +2,57 @@ import re
 import sys
 
 
-class Rule:
-    def __init__(self, field: str):
-        self.field = field
-        self.ranges = []
-
-    def passes(self, value: int) -> bool:
-        return any(rule_range[0] <= value <= rule_range[1] for rule_range in self.ranges)
-
-
-class Ticket:
-    def __init__(self, fields: list[int]):
-        self.fields = fields
-
-    def sum_invalid(self, rules: list[Rule]) -> int:
-        return sum(field for field in self.fields if not any(rule.passes(field) for rule in rules))
-
-
 def main():
-    rules = []
-    while rule_match := re.match(r'([^:]+): (.+)', sys.stdin.readline().strip()):
-        rules.append(Rule(field=rule_match.group(1)))
-        for rule_range in rule_match.group(2).split(' or '):
-            rules[-1].ranges.append([int(val) for val in rule_range.split('-')])
+    rules = dict()
+    while match := re.match(r'(?P<name>[^:]+): (?P<ranges>.+)', sys.stdin.readline().strip()):
+        rules[match['name']] = [tuple(map(int, rule_range.split('-'))) for rule_range in match['ranges'].split(' or ')]
 
     sys.stdin.readline()
-    your_ticket = Ticket(fields=[int(val) for val in sys.stdin.readline().strip().split(',')])
+    your_ticket = list(map(int, sys.stdin.readline().strip().split(',')))
 
     sys.stdin.readline()
     sys.stdin.readline()
-    nearby_tickets = [Ticket([int(val) for val in line.strip().split(',')]) for line in sys.stdin.readlines()]
+    nearby_tickets = [list(map(int, line.strip().split(','))) for line in sys.stdin.readlines()]
 
-    print(sum(ticket.sum_invalid(rules) for ticket in nearby_tickets))
+    print(sum(
+        value
+        for ticket in nearby_tickets
+        for value in ticket
+        if not any(a <= value <= b for rule in rules.values() for a, b in rule)
+    ))
 
-    valid_nearby_tickets = [ticket for ticket in nearby_tickets if not ticket.sum_invalid(rules)]
+    valid_tickets = list(filter(
+        lambda ticket: all(any(a <= value <= b for rule in rules.values() for a, b in rule) for value in ticket),
+        nearby_tickets
+    ))
 
-    # TODO
+    fields = [set(rules.keys()) for _ in rules]
+    for i, field in enumerate(fields):
+        for name, rule in rules.items():
+            if not all(
+                    any(rule_range[0] <= ticket[i] <= rule_range[1] for rule_range in rule)
+                    for ticket in valid_tickets
+            ):
+                field.remove(name)
+
+    while any(len(candidates) > 1 for candidates in fields):
+        for field, candidates in enumerate(fields):
+            if len(candidates) > 1:
+                continue
+
+            needle = list(candidates)[0]
+            for other in range(len(fields)):
+                if field == other:
+                    continue
+                if needle in fields[other]:
+                    fields[other].remove(needle)
+
+    output = 1
+    for i, field in enumerate(fields):
+        if list(field)[0].startswith('departure'):
+            output *= your_ticket[i]
+
+    print(output)
 
 
 if __name__ == '__main__':
