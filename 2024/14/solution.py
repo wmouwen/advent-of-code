@@ -1,6 +1,7 @@
 import re
 import sys
 from functools import reduce
+from statistics import variance
 from typing import NamedTuple
 
 Vector = NamedTuple('Vector', {('x', int), ('y', int)})
@@ -39,14 +40,23 @@ def main():
 
     print(safety_factor(positions_after_seconds(robots, 100, space), space))
 
-    for t in range(space.x * space.y):
+    best_x, best_y = 0, 0
+    best_variances = {'x': len(robots) * space.x, 'y': len(robots) * space.y}
+    for t in range(max(space.x, space.y)):
         positions = positions_after_seconds(robots, t, space)
 
-        if len(positions) == len(set(positions)):
-            # for y in range(space.y):
-            #     print(''.join('*' if Vector(x=x, y=y) in positions else ' ' for x in range(space.x)))
-            print(t)
-            break
+        variance_x = variance(position.x for position in positions)
+        if t < space.x and variance_x < best_variances['x']:
+            best_variances['x'] = variance_x
+            best_x = t
+
+        variance_y = variance(position.y for position in positions)
+        if t < space.y and variance_y < best_variances['y']:
+            best_variances['y'] = variance_y
+            best_y = t
+
+    # t = best_x % space.x = best_y % space.y
+    print(best_x + ((pow(space.x, -1, mod=space.y) * (best_y - best_x)) % space.y) * space.x)
 
 
 if __name__ == '__main__':
