@@ -1,18 +1,34 @@
 import re
 import sys
-from queue import Queue
+from functools import cache
+
+
+@cache
+def towel_arrangements(pattern: str, towels: tuple):
+    if pattern == '':
+        return 1
+
+    count = 0
+    for towel in towels:
+        if pattern.startswith(towel):
+            count += towel_arrangements(pattern[len(towel):], towels)
+
+    return count
 
 
 def main():
-    towels = re.findall(r'(\w+)', sys.stdin.readline())
+    towels = tuple(re.findall(r'(\w+)', sys.stdin.readline()))
     sys.stdin.readline()
 
-    pattern = '^(' + '|'.join(towels) + ')+$'
     possible = 0
+    total_possibilities = 0
     for line in sys.stdin:
-        possible += int(re.match(pattern, line.strip()) is not None)
+        arrangements = towel_arrangements(line.strip(), towels)
+        possible += int(arrangements > 0)
+        total_possibilities += arrangements
 
     print(possible)
+    print(total_possibilities)
 
 
 if __name__ == '__main__':
