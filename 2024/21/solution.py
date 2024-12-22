@@ -1,6 +1,7 @@
 import re
 import sys
 from functools import cache
+from itertools import pairwise
 from typing import NamedTuple
 
 
@@ -60,69 +61,45 @@ NUMPAD_PATHS = calc_paths(NUMPAD)
 KEYPAD_PATHS = calc_paths(KEYPAD)
 
 
-def control_numpad(buttons_to_press):
+def numpad_to_keypad(buttons_to_press):
     paths = ['']
-    current_position = 'A'
 
-    for button in buttons_to_press:
+    for a, b in pairwise('A' + buttons_to_press):
         paths = [
             history + addition + 'A'
             for history in paths
-            for addition in NUMPAD_PATHS[current_position][button]
+            for addition in NUMPAD_PATHS[a][b]
         ]
-        current_position = button
 
     return paths
 
 
 @cache
-def control_keypad(buttons_to_press):
-    paths = ['']
-    current_position = 'A'
+def min_presses(code, max_depth, depth=0):
+    if depth == max_depth:
+        return len(code)
 
-    for button in buttons_to_press:
-        paths = [
-            history + addition + 'A'
-            for history in paths
-            for addition in KEYPAD_PATHS[current_position][button]
-        ]
-        current_position = button
-
-    return paths
+    return sum(
+        min(min_presses(path + 'A', max_depth, depth + 1) for path in KEYPAD_PATHS[a][b])
+        for a, b in pairwise('A' + code)
+    )
 
 
 def main():
-    complexity_sum_two = 0
-    complexity_sum_twentyfive = 0
+    complexity_part_one = 0
+    complexity_part_two = 0
 
     for line in sys.stdin:
         code = line.strip()
         numeric_part = int(re.search(r'[1-9]\d+', line.strip()).group(0))
 
-        paths = control_numpad(code)
+        paths = numpad_to_keypad(code)
 
-        for i in range(2):
-            paths = [
-                new_path
-                for old_path in paths
-                for new_path in control_keypad(old_path)
-            ]
+        complexity_part_one += numeric_part * min(min_presses(path, 2) for path in paths)
+        complexity_part_two += numeric_part * min(min_presses(path, 25) for path in paths)
 
-        complexity_sum_two += numeric_part * min(len(path) for path in paths)
-
-        # for i in range(23):
-        #     shortest = min(len(p) for p in paths)
-        #
-        #     paths = [
-        #         new_path
-        #         for old_path in filter(lambda path: len(path) == shortest, paths)
-        #         for new_path in control_keypad(old_path)
-        #     ]
-        #
-        # complexity_sum_twentyfive += numeric_part * min(len(path) for path in paths)
-
-    print(complexity_sum_two)
-    print(complexity_sum_twentyfive)
+    print(complexity_part_one)
+    print(complexity_part_two)
 
 
 if __name__ == '__main__':
