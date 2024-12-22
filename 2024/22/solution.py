@@ -1,8 +1,7 @@
 import sys
-from functools import cache
+from collections import defaultdict
 
 
-@cache
 def evolve(secret):
     secret = ((secret << 6) ^ secret) & 16777215
     secret = ((secret >> 5) ^ secret) & 16777215
@@ -12,19 +11,33 @@ def evolve(secret):
 
 
 def main():
-    new_secret_sum = 0
+    last_secret_sum = 0
+    gains = defaultdict(int)
 
     for line in sys.stdin:
         if line.strip() == '':
             break
 
         secret = int(line.strip())
+        prices = [secret % 10]
+        changes = []
+        sequences = dict()
+
         for _ in range(2000):
             secret = evolve(secret)
 
-        new_secret_sum += secret
+            prices.append(secret % 10)
+            changes.append(prices[-1] - prices[-2])
 
-    print(new_secret_sum)
+            if len(changes) >= 4 and (seq := tuple(changes[-4:])) not in sequences.keys():
+                sequences[seq] = prices[-1]
+
+        last_secret_sum += secret
+
+        for seq, price in sequences.items(): gains[seq] += price
+
+    print(last_secret_sum)
+    print(max(gain for gain in gains.values()))
 
 
 if __name__ == '__main__':
