@@ -29,18 +29,18 @@ InputCallback = Callable[[], int]
 OutputCallback = Callable[[int], None]
 
 
-def split_instruction(instruction: Instruction) -> tuple[Opcode, list[ParameterMode]]:
-    opcode = Opcode(instruction % 100)
-    parameter_modes = [
-        ParameterMode((instruction // 100) % 10),
-        ParameterMode((instruction // 1000) % 10),
-        ParameterMode((instruction // 10000) % 10),
-    ]
-
-    return opcode, parameter_modes
-
-
 class IntcodeComputer:
+    @staticmethod
+    def _split_instruction(instruction: Instruction) -> tuple[Opcode, tuple[ParameterMode, ...]]:
+        opcode = Opcode(instruction % 100)
+        modes = (
+            ParameterMode((instruction // 100) % 10),
+            ParameterMode((instruction // 1000) % 10),
+            ParameterMode((instruction // 10000) % 10),
+        )
+
+        return opcode, modes
+
     def __init__(
             self,
             program: list[Instruction | int],
@@ -63,6 +63,8 @@ class IntcodeComputer:
                     return self.memory[addr]
                 case ParameterMode.RELATIVE:
                     return self.relative_base + self.memory[addr]
+                case _:
+                    raise Exception(f"Unknown parameter mode: {mode}")
 
         else:
             match mode:
@@ -82,7 +84,7 @@ class IntcodeComputer:
 
     def run(self):
         while True:
-            opcode, modes = split_instruction(self.read(self.ip, ParameterMode.IMMEDIATE))
+            opcode, modes = self._split_instruction(self.read(self.ip, ParameterMode.IMMEDIATE))
 
             match opcode:
                 case Opcode.ADD:
