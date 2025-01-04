@@ -24,12 +24,6 @@ class Operation(Enum):
 type Instruction = (Operation, int, int, int)
 
 
-class LoopException(Exception): pass
-
-
-class MaxCyclesReachedException(Exception): pass
-
-
 def parse_instructions(lines: list[str]) -> tuple[list[Instruction], int | None]:
     ip_register = None
     instructions = []
@@ -67,10 +61,7 @@ class Device:
         self.registers = [0] * len(self.registers)
         self._instruction_pointer = 0
 
-    def run(self, halt_on_ip: int = None, halt_after_cycles: int = None, raise_on_loop: bool = False):
-        state_history = set()
-        cycles = 0
-
+    def run(self, halt_on_ip: int = None):
         while 0 <= self._instruction_pointer < len(self._instructions) and halt_on_ip != self._instruction_pointer:
             if self._bind_instruction_pointer is not None:
                 self.registers[self._bind_instruction_pointer] = self._instruction_pointer
@@ -80,16 +71,8 @@ class Device:
 
             if self._bind_instruction_pointer is not None:
                 self._instruction_pointer = self.registers[self._bind_instruction_pointer]
+
             self._instruction_pointer += 1
-
-            cycles += 1
-            if halt_after_cycles is not None and cycles >= halt_after_cycles:
-                raise MaxCyclesReachedException()
-
-            if raise_on_loop:
-                if (state := (self._instruction_pointer, *self.registers)) in state_history:
-                    raise LoopException()
-                state_history.add(state)
 
     def execute(self, operation: Operation, a: int, b: int, c: int):
         match operation:

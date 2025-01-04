@@ -1,28 +1,40 @@
 import os
-import re
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../device')))
-from device import Device, parse_instructions, MaxCyclesReachedException, LoopException
+from device import parse_instructions
 
 
 def main():
     instructions, ip_register = parse_instructions(sys.stdin.readlines())
+    seed, prime = instructions[7][1], instructions[11][2]
 
-    # Locate correct number manually with reverse engineering. The `eqrr` line is key.
-    for i in range(1, 317368400):
-        try:
-            device = Device(register_count=6, instructions=instructions, ip_register=ip_register)
-            device.registers[0] = i
-            device.run(raise_on_loop=True, halt_after_cycles=20000)
-            print(device.executions)
-        except MaxCyclesReachedException:
-            continue
-        except LoopException:
-            continue
+    nr, cycle = 0, 0
+    seen = list()
 
-        print(i)
-        break
+    while True:
+        nr = calc_next_nr(nr, seed, prime)
+
+        if len(seen) == 0:
+            print(nr)
+
+        if nr in seen:
+            print(seen[-1])
+            break
+
+        seen.append(nr)
+
+
+def calc_next_nr(nr: int, seed: int, prime: int):
+    x = nr | 65536
+    nr = seed
+
+    while x > 0:
+        nr = (nr + (x & 255)) & 16777215
+        nr = (nr * prime) & 16777215
+        x >>= 8
+
+    return nr
 
 
 if __name__ == '__main__':
