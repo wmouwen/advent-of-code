@@ -12,11 +12,11 @@ def calc_prime_factors(n):
     factors = []
 
     while i * i <= n:
-        if n % i:
-            i += 1
-        else:
-            n //= i
+        if n % i == 0:
             factors.append(i)
+            n //= i
+        else:
+            i += 1
 
     if n > 1:
         factors.append(n)
@@ -27,25 +27,21 @@ def calc_prime_factors(n):
 def find_answer(target):
     prime_factors = calc_prime_factors(target)
 
-    return sum([
-        sum(
-            prod(c)
-            for n in range(2, len(prime_factors) + 1)
-            for c in combinations(prime_factors, n)
-        ),
-        sum(prime_factors),
-        1
-    ])
+    return 1 + sum(prod(c) for n in range(len(prime_factors)) for c in combinations(prime_factors, n + 1))
 
 
 def main():
     instructions, ip_register = parse_instructions(sys.stdin.readlines())
+    target_register = instructions[4][2]
 
-    for start in [0, 1]:
-        device = Device(register_count=6, instructions=instructions, ip_register=ip_register)
-        device.registers[0] = start
-        device.run(halt_on_ip=3)
-        print(find_answer(device.registers[instructions[4][2]]))
+    device = Device(register_count=6, instructions=instructions, ip_register=ip_register)
+    device.run(halt_on_ip=3)
+    print(find_answer(device.registers[target_register]))
+
+    device.reset()
+    device.registers[0] = 1
+    device.run(halt_on_ip=3)
+    print(find_answer(device.registers[target_register]))
 
 
 if __name__ == '__main__':

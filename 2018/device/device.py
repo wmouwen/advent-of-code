@@ -27,7 +27,7 @@ type Instruction = (Operation, int, int, int)
 class LoopException(Exception): pass
 
 
-class ExecutionsExceededException(Exception): pass
+class MaxCyclesReachedException(Exception): pass
 
 
 def parse_instructions(lines: list[str]) -> tuple[list[Instruction], int | None]:
@@ -53,7 +53,6 @@ class Device:
     _instruction_pointer: int = 0
     _bind_instruction_pointer: int
 
-
     def __init__(
             self,
             register_count: int,
@@ -63,6 +62,10 @@ class Device:
         self.registers = [0] * register_count
         self._instructions = instructions if instructions is not None else []
         self._bind_instruction_pointer = ip_register
+
+    def reset(self):
+        self.registers = [0] * len(self.registers)
+        self._instruction_pointer = 0
 
     def run(self, halt_on_ip: int = None, halt_after_cycles: int = None, raise_on_loop: bool = False):
         state_history = set()
@@ -81,11 +84,10 @@ class Device:
 
             cycles += 1
             if halt_after_cycles is not None and cycles >= halt_after_cycles:
-                raise ExecutionsExceededException()
+                raise MaxCyclesReachedException()
 
             if raise_on_loop:
-                state = (self._instruction_pointer, *self.registers)
-                if state in state_history:
+                if (state := (self._instruction_pointer, *self.registers)) in state_history:
                     raise LoopException()
                 state_history.add(state)
 

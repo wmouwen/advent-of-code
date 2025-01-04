@@ -3,7 +3,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../device')))
-from device import Device, parse_instructions, ExecutionsExceededException, LoopException
+from device import Device, parse_instructions, MaxCyclesReachedException, LoopException
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
             device.registers[0] = i
             device.run(raise_on_loop=True, halt_after_cycles=20000)
             print(device.executions)
-        except ExecutionsExceededException:
+        except MaxCyclesReachedException:
             continue
         except LoopException:
             continue
