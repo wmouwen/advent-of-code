@@ -14,7 +14,7 @@ def main():
         try:
             device = Device(register_count=6, instructions=instructions, ip_register=ip_register)
             device.registers[0] = i
-            device.run(break_on_loop=True, max_executions=20000)
+            device.run(raise_on_loop=True, halt_after_cycles=20000)
             print(device.executions)
         except ExecutionsExceededException:
             continue

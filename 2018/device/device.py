@@ -24,6 +24,12 @@ class Operation(Enum):
 type Instruction = (Operation, int, int, int)
 
 
+class LoopException(Exception): pass
+
+
+class ExecutionsExceededException(Exception): pass
+
+
 def parse_instructions(lines: list[str]) -> tuple[list[Instruction], int | None]:
     ip_register = None
     instructions = []
@@ -40,14 +46,6 @@ def parse_instructions(lines: list[str]) -> tuple[list[Instruction], int | None]
     return instructions, ip_register
 
 
-class LoopException(Exception):
-    pass
-
-
-class ExecutionsExceededException(Exception):
-    pass
-
-
 class Device:
     registers: list[int]
 
@@ -55,7 +53,6 @@ class Device:
     _instruction_pointer: int = 0
     _bind_instruction_pointer: int
 
-    executions: int = 0
 
     def __init__(
             self,
@@ -67,32 +64,32 @@ class Device:
         self._instructions = instructions if instructions is not None else []
         self._bind_instruction_pointer = ip_register
 
-    def run(self, break_on_loop: bool = False, max_executions: int = None):
+    def run(self, halt_on_ip: int = None, halt_after_cycles: int = None, raise_on_loop: bool = False):
         state_history = set()
+        cycles = 0
 
-        while 0 <= self._instruction_pointer < len(self._instructions):
+        while 0 <= self._instruction_pointer < len(self._instructions) and halt_on_ip != self._instruction_pointer:
             if self._bind_instruction_pointer is not None:
                 self.registers[self._bind_instruction_pointer] = self._instruction_pointer
 
-            # print(self.registers, self._instructions[self._instruction_pointer], self._instruction_pointer)
+            # print(self._instructions[self._instruction_pointer], self.registers)
             self.execute(*self._instructions[self._instruction_pointer])
 
             if self._bind_instruction_pointer is not None:
                 self._instruction_pointer = self.registers[self._bind_instruction_pointer]
             self._instruction_pointer += 1
 
-            if break_on_loop:
+            cycles += 1
+            if halt_after_cycles is not None and cycles >= halt_after_cycles:
+                raise ExecutionsExceededException()
+
+            if raise_on_loop:
                 state = (self._instruction_pointer, *self.registers)
                 if state in state_history:
                     raise LoopException()
                 state_history.add(state)
 
-            if max_executions is not None and self.executions >= max_executions:
-                raise ExecutionsExceededException()
-
     def execute(self, operation: Operation, a: int, b: int, c: int):
-        self.executions += 1
-
         match operation:
             case Operation.addr:
                 self.registers[c] = self.registers[a] + self.registers[b]
