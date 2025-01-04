@@ -1,3 +1,4 @@
+import re
 from enum import Enum
 
 
@@ -22,8 +23,26 @@ class Operation(Enum):
 
 type Instruction = (Operation, int, int, int)
 
+
+def parse_instructions(lines: list[str]) -> tuple[list[Instruction], int | None]:
+    ip_register = None
+    instructions = []
+
+    for line in lines:
+        if match := re.match(r'^#ip (-?\d+)$', line.strip()):
+            ip_register = int(match.group(1))
+
+        if match := re.match(r'^(\w+) (-?\d+) (-?\d+) (-?\d+)$', line.strip()):
+            instructions.append(
+                (Operation[match.group(1)], int(match.group(2)), int(match.group(3)), int(match.group(4)))
+            )
+
+    return instructions, ip_register
+
+
 class LoopException(Exception):
     pass
+
 
 class ExecutionsExceededException(Exception):
     pass

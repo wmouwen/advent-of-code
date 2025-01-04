@@ -3,21 +3,11 @@ import re
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../device')))
-from device import Device, Operation, ExecutionsExceededException, LoopException
+from device import Device, parse_instructions, ExecutionsExceededException, LoopException
 
 
 def main():
-    ip_register = None
-    instructions = []
-
-    for line in sys.stdin:
-        if match := re.match(r'^#ip (-?\d+)$', line.strip()):
-            ip_register = int(match.group(1))
-
-        if match := re.match(r'^(\w+) (-?\d+) (-?\d+) (-?\d+)$', line.strip()):
-            instructions.append(
-                (Operation[match.group(1)], int(match.group(2)), int(match.group(3)), int(match.group(4)))
-            )
+    instructions, ip_register = parse_instructions(sys.stdin.readlines())
 
     # Locate correct number manually with reverse engineering. The `eqrr` line is key.
     for i in range(1, 317368400):
