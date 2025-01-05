@@ -1,41 +1,47 @@
-import collections
 import sys
+from math import prod
 
 
-def crab_move(deque):
-    current = deque[0]
-    label_max = len(deque)
+def build_dict(seed: list[int], stretch: int = None) -> dict[int, int]:
+    cups = {seed[i - 1]: seed[i] for i in range(len(seed))}
 
-    # Pick 3 cups
-    deque.rotate(-1)
-    picks = [deque.popleft() for _ in range(3)]
+    if stretch is not None:
+        cups.update({i: i + 1 for i in range(len(seed) + 1, stretch + 1)})
+        cups[seed[-1]] = len(seed) + 1
+        cups[stretch] = seed[0]
 
-    # Determine destination
-    destination = current
-    while True:
-        destination = destination - 1 if destination > 1 else label_max
-        if destination not in picks:
-            break
+    return cups
 
-    # Reinsert picked cups
-    deque.rotate(-1 * (deque.index(destination) + 1))
-    deque.extendleft(reversed(picks))
 
-    # Move next target to front of deque
-    deque.rotate(-1 * (deque.index(current) + 1))
+def mix(cups: dict[int, int], current: int, moves: int):
+    for m in range(moves):
+        selected = (cups[current], cups[cups[current]], cups[cups[cups[current]]])
 
-    return deque
+        destination = ((current - 2) % len(cups)) + 1
+        while destination in selected:
+            destination = ((destination - 2) % len(cups)) + 1
+
+        cups[current] = cups[selected[-1]]
+        cups[selected[-1]] = cups[destination]
+        cups[destination] = selected[0]
+
+        current = cups[current]
+
+
+def first_n(cups: dict[int, int], current: int, n: int) -> list[int]:
+    return [(current := cups[current]) for _ in range(n)]
 
 
 def main():
-    initial_list = list(map(int, list(sys.stdin.readline().strip())))
+    seed = list(map(int, list(sys.stdin.readline().strip())))
 
-    deque = collections.deque(initial_list)
-    for _ in range(100):
-        deque = crab_move(deque)
+    cups = build_dict(seed)
+    mix(cups, current=seed[0], moves=100)
+    print(''.join(map(str, first_n(cups, current=1, n=len(seed) - 1))))
 
-    deque.rotate(-1 * (deque.index(1)))
-    print(''.join(map(str, list(deque)[1:])))
+    cups = build_dict(seed, stretch=1_000_000)
+    mix(cups, current=seed[0], moves=10_000_000)
+    print(prod(first_n(cups, current=1, n=2)))
 
 
 if __name__ == "__main__":
