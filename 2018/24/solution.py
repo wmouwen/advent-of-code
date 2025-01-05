@@ -132,7 +132,7 @@ def main():
     survivors = combat(groups)
     print(sum(survivor.units for survivor in survivors))
 
-    boost_min, boost_max = 0, 1 << 20
+    boost_min, boost_max = 0, 1 << 31
     while boost_min < boost_max:
         boost = boost_min + (boost_max - boost_min) // 2
         survivors = combat(groups, boost=boost)
@@ -143,6 +143,7 @@ def main():
             boost_max = boost
 
     survivors = combat(groups, boost=boost_min)
+    assert not any(survivor.party == Party.INFECTION for survivor in survivors)
     print(sum(survivor.units for survivor in survivors))
 
 
