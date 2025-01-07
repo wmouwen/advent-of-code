@@ -11,6 +11,9 @@ class V(NamedTuple):
         return V(x=self.x + other.x, y=self.y + other.y)
 
 
+Link = NamedTuple('Link', [('facing', int), ('offset', int), ('reverse', bool)])
+State = tuple[V, int]
+
 DIRECTIONS = (V(x=1, y=0), V(x=0, y=1), V(x=-1, y=0), V(x=0, y=-1))
 
 
@@ -18,56 +21,50 @@ def password(pos, facing):
     return 1000 * (pos.y + 1) + 4 * (pos.x + 1) + (facing % len(DIRECTIONS))
 
 
-def oob_flat(grid, pos, facing) -> (V, int):
+def oob_flat(grid, pos, facing) -> State:
     pos += DIRECTIONS[facing]
     return V(x=pos.x % len(grid[pos.y % len(grid)]), y=pos.y % len(grid)), facing
 
 
-def oob_cube_test(grid, pos, facing) -> (V, int):
+def warp(x_max: int, y_max: int, size: int, index: int, link: Link) -> State:
+    facing, offset, reverse = link
+    index = (offset * size) + ((index % size) if not reverse else (size - (index % size) - 1))
+
+    if facing == 0: return V(x=0, y=index), facing
+    if facing == 1: return V(x=index, y=0), facing
+    if facing == 2: return V(x=x_max, y=index), facing
+    if facing == 3: return V(x=index, y=y_max), facing
+    raise Exception
+
+
+def oob_cube(grid, pos, facing, links) -> State:
+    pos += DIRECTIONS[facing]
+    size, x_max, y_max = len(grid) // len(links[0]), len(grid[0]) - 1, len(grid) - 1
+
+    if pos.x > x_max: return warp(x_max, y_max, size, pos.y, links[facing][pos.y // size])
+    if pos.y > y_max: return warp(x_max, y_max, size, pos.x, links[facing][pos.x // size])
+    if pos.x < 0: return warp(x_max, y_max, size, pos.y, links[facing][pos.y // size])
+    if pos.y < 0: return warp(x_max, y_max, size, pos.x, links[facing][pos.x // size])
+
+    return pos, facing
+
+
+def oob_cube_test(grid, pos, facing) -> State:
     """
     Cube layout:
       __#_
       ###_
       __##
     """
-
-    pos += DIRECTIONS[facing]
-
-    size = len(grid) // 3
-    x_max, y_max = 4 * size - 1, 3 * size - 1
-    fwd = lambda o, c: o * size + (c % size)
-    rev = lambda o, c: o * size + size - (c % size) - 1
-
-    if pos.y < 0:
-        if 0 * size <= pos.x < 1 * size: return V(x=rev(o=2, c=pos.x), y=0), 1
-        if 1 * size <= pos.x < 2 * size: return V(x=0, y=fwd(o=0, c=pos.x)), 0
-        if 2 * size <= pos.x < 3 * size: return V(x=rev(o=0, c=pos.x), y=0), 1
-        if 3 * size <= pos.x < 4 * size: return V(x=x_max, y=rev(o=1, c=pos.x)), 2
-        raise Exception
-
-    if pos.y >= 3 * size:
-        if 0 * size <= pos.x < 1 * size: return V(x=rev(o=2, c=pos.x), y=y_max), 3
-        if 1 * size <= pos.x < 2 * size: return V(x=0, y=fwd(o=2, c=pos.x)), 0
-        if 2 * size <= pos.x < 3 * size: return V(x=rev(o=0, c=pos.x), y=y_max), 3
-        if 3 * size <= pos.x < 4 * size: return V(x=x_max, y=rev(o=1, c=pos.x)), 2
-        raise Exception
-
-    if pos.x < 0:
-        if 0 * size <= pos.y < 1 * size: return V(x=rev(o=1, c=pos.y), y=0), 1
-        if 1 * size <= pos.y < 2 * size: return V(x=rev(o=3, c=pos.y), y=y_max), 3
-        if 2 * size <= pos.y < 3 * size: return V(x=rev(o=1, c=pos.y), y=y_max), 3
-        raise Exception
-
-    if pos.x >= 4 * size:
-        if 0 * size <= pos.y < 1 * size: return V(x=x_max, y=rev(o=2, c=pos.y)), 2
-        if 1 * size <= pos.y < 2 * size: return V(x=rev(o=3, c=pos.y), y=0), 1
-        if 2 * size <= pos.y < 3 * size: return V(x=x_max, y=rev(o=0, c=pos.y)), 2
-        raise Exception
-
-    return pos, facing
+    return oob_cube(grid, pos, facing, {
+        0: [Link(2, 2, True), Link(1, 3, True), Link(2, 0, True)],
+        1: [Link(3, 2, True), Link(0, 2, False), Link(3, 0, True), Link(2, 1, True)],
+        2: [Link(1, 1, True), Link(3, 3, True), Link(3, 1, True)],
+        3: [Link(1, 2, True), Link(0, 0, False), Link(1, 0, True), Link(2, 1, True)],
+    })
 
 
-def oob_cube_puzzle(grid, pos, facing) -> (V, int):
+def oob_cube_puzzle(grid, pos, facing) -> State:
     """
     Cube layout:
       _##
@@ -75,10 +72,13 @@ def oob_cube_puzzle(grid, pos, facing) -> (V, int):
       ##_
       #__
     """
-
-    pos += DIRECTIONS[facing]
-
-    raise Exception('Not implemented')
+    return oob_cube(grid, pos, facing, {
+        # TODO Revisit links from scratch
+        0: [Link(2, 2, True), Link(3, 2, False), Link(2, 0, True), Link(3, 1, False)],
+        1: [Link(1, 2, False), Link(2, 3, False), Link(2, 1, False)],
+        2: [Link(0, 3, True), Link(1, 0, False), Link(0, 0, True), Link(0, 0, True)],
+        3: [Link(1, 2, False), Link(2, 3, False), Link(2, 1, False)],
+    })
 
 
 def walk(grid, instructions, move_callback):
