@@ -73,11 +73,10 @@ def oob_cube_puzzle(grid, pos, facing) -> State:
       #__
     """
     return oob_cube(grid, pos, facing, {
-        # TODO Revisit links from scratch
         0: [Link(2, 2, True), Link(3, 2, False), Link(2, 0, True), Link(3, 1, False)],
         1: [Link(1, 2, False), Link(2, 3, False), Link(2, 1, False)],
-        2: [Link(0, 3, True), Link(1, 0, False), Link(0, 0, True), Link(0, 0, True)],
-        3: [Link(1, 2, False), Link(2, 3, False), Link(2, 1, False)],
+        2: [Link(0, 2, True), Link(1, 0, False), Link(0, 0, True), Link(1, 1, False)],
+        3: [Link(0, 1, False), Link(0, 3, False), Link(3, 0, False)],
     })
 
 
