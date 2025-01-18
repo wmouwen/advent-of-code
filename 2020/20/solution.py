@@ -1,54 +1,10 @@
 import re
 import sys
-from math import prod
+from math import prod, sqrt
 
 
-def line_to_int(line: str) -> int:
-    line = line.replace('.', '0').replace('#', '1')
-    return int(line, 2)
-
-
-def map_neighbours(tiles) -> dict:
-    neighbours = {
-        key: [other for other in tiles.keys() if key != other and any(
-            side == other_side
-            for orientation in tiles[key]
-            for side in orientation
-            for other_orientation in tiles[other]
-            for other_side in other_orientation
-        )]
-        for key in tiles.keys()
-    }
-
-    print([
-        key for key, n in neighbours.items() if len(n) == 2
-    ])
-    print(prod([
-        key for key, n in neighbours.items() if len(n) == 2
-    ]))
-
-    # print(*neighbours.items(), sep="\n")
-    exit(0)
-    return dict()
-
-
-def create_picture(tiles, neighbours=None, placed=None, picture=None):
-    if picture is None:
-        picture = []
-    elif len(picture) == len(tiles):
-        return picture
-
-    if neighbours is None:
-        neighbours = map_neighbours(tiles)
-    if placed is None:
-        placed = set()
-
-    return None
-
-
-def main():
+def map_input():
     tile_grids, key = {}, None
-
     for line in sys.stdin:
         if match := re.match(r'^Tile (\d+):', line.strip()):
             key = int(match.group(1))
@@ -56,8 +12,15 @@ def main():
         elif line.strip() != '':
             assert key is not None
             tile_grids[key].append(line.strip())
+    return tile_grids
 
-    tiles = {key: (
+
+def map_tile_edges(tile_grids):
+    def line_to_int(line: str) -> int:
+        line = line.replace('.', '0').replace('#', '1')
+        return int(line, 2)
+
+    return {key: (
         (  # Normal: NESW, clockwise
             line_to_int(grid[0]),
             line_to_int(''.join(grid[y][-1] for y in range(len(grid)))),
@@ -72,8 +35,44 @@ def main():
         )
     ) for key, grid in tile_grids.items()}
 
-    picture = create_picture(tiles)
-    print(picture)
+
+def map_neighbours(tile_edges) -> dict:
+    neighbours = dict()
+
+    for key, tile in tile_edges.items():
+        neighbours[key] = ([None] * 4, [None] * 4)
+
+        for orientation, edges in enumerate(tile):
+            for direction, edge in enumerate(edges):
+                neighbour = [
+                    (other, other_orientation, other_direction)
+                    for other, other_edges in tile_edges.items()
+                    for other_orientation, other_edges in enumerate(other_edges)
+                    for other_direction, other_edge in enumerate(other_edges)
+                    if other != key and other_edge == edge
+                ]
+
+                if neighbour:
+                    neighbours[key][orientation][direction] = neighbour[0]
+
+    return neighbours
+
+
+def main():
+    tile_grids = map_input()
+    picture_size = int(sqrt(len(tile_grids)))
+    tile_edges = map_tile_edges(tile_grids)
+    neighbours = map_neighbours(tile_edges)
+
+    # Assert puzzle input has a single possible layout
+    num_edges_found = sum(1 for v in neighbours.values() for o in v for e in o if e is not None)
+    num_edges_required = 2 * 4 + 3 * (picture_size - 2) * 4 + 4 * (picture_size - 2) * (picture_size - 2)
+    assert num_edges_found == num_edges_required * 2
+
+    corners = {k: v for k, v in neighbours.items() if len([1 for a in v for b in a if b is not None]) == 2 * 2}
+    print(prod(corners.keys()))
+
+    # print(*neighbours.items(), sep='\n')
 
 
 if __name__ == '__main__':
