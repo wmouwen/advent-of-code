@@ -27,8 +27,8 @@ for step in init_sequence:
 
 print(
     sum(
-        b * l * box[lens]
-        for b, box in enumerate(boxes, start=1)
-        for l, lens in enumerate(box, start=1)
+        bi * li * box[lens]
+        for bi, box in enumerate(boxes, start=1)
+        for li, lens in enumerate(box, start=1)
     )
 )

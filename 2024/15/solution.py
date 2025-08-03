@@ -1,6 +1,5 @@
 import sys
 from queue import Queue
-from typing import NamedTuple
 
 
 class Grid:

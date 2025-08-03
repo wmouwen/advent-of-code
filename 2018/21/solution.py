@@ -11,7 +11,7 @@ def main():
     instructions, ip_register = parse_instructions(sys.stdin.readlines())
     seed, prime = instructions[7][1], instructions[11][2]
 
-    nr, cycle = 0, 0
+    nr = 0
     seen = list()
 
     while True:

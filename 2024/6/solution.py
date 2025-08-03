@@ -1,7 +1,5 @@
-import functools
 import sys
 from collections import namedtuple
-from math import floor
 
 Vector = namedtuple('Vector', 'y x')
 
