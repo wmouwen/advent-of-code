@@ -1,20 +1,11 @@
 import re
 import sys
 
-Rules = dict[str, str | list[str]]
+Rules = dict[str, str | list[list[str]]]
 
 
-def compile_regex(rules: Rules, nr: str) -> str:
-    if isinstance(rules[nr], str):
-        return rules[nr]
-
-    subregex = '|'.join([''.join(compile_regex(rules, item) for item in subrule) for subrule in rules[nr]])
-
-    return f'({subregex})'
-
-
-def main():
-    rules: Rules = {}
+def get_rules() -> Rules:
+    rules = {}
 
     for line in sys.stdin:
         if line.strip() == '':
@@ -27,15 +18,42 @@ def main():
         else:
             rules[nr] = [subrule.split(' ') for subrule in rule.split(' | ')]
 
-    regex = '^' + compile_regex(rules, '0') + '$'
+    return rules
 
-    valid = 0
-    for line in sys.stdin:
-        if re.match(regex, line.strip()):
-            valid += 1
-    print(valid)
 
-    # TODO Convert to state machine for part 2, or apply some regex trickery specifically for rules 8 and 11
+def solve(message: str, rules: Rules, current: str) -> list[str]:
+    rule = rules[current]
+
+    if isinstance(rule, str):
+        return [message[len(rule):]] if message[:len(rule)] == rule else []
+
+    all_options = []
+
+    for rule_part in rule:
+        options = [message]
+
+        for next_rule in rule_part:
+            next_options = []
+
+            for option in options:
+                next_options.extend(solve(option, rules, next_rule))
+
+            options = next_options
+        all_options.extend(options)
+
+    return all_options
+
+
+def main():
+    rules = get_rules()
+    messages = [line.strip() for line in sys.stdin]
+
+    print(sum(1 if "" in solve(message, rules, '0') else 0 for message in messages))
+
+    rules['8'] = [['42'], ['42', '8']]
+    rules['11'] = [['42', '31'], ['42', '11', '31']]
+
+    print(sum(1 if "" in solve(message, rules, '0') else 0 for message in messages))
 
 
 if __name__ == '__main__':
