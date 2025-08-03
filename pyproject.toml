@@ -1,5 +1,5 @@
 [project]
-name = "wmouwen.advent-of-code"
+name = "advent-of-code"
 version = "0.dev"
 dependencies = [
     "pip ~= 25.2",
