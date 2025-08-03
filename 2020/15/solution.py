@@ -2,7 +2,9 @@ import sys
 
 
 def spoken_in_turn(turns: int, numbers: list[int]) -> int:
-    last_occurrence = dict((number, turn + 1) for turn, number in enumerate(numbers[:-1]))
+    last_occurrence = dict(
+        (number, turn + 1) for turn, number in enumerate(numbers[:-1])
+    )
     previous = numbers[-1]
     turn = len(numbers)
 

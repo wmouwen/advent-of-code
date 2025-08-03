@@ -57,11 +57,7 @@ def wipe_player(player, blizzards):
 
 
 def main():
-    grid = [
-        list(line.strip())
-        for line in sys.stdin
-        if line.strip() != ''
-    ]
+    grid = [list(line.strip()) for line in sys.stdin if line.strip() != '']
 
     start = (grid[0].index('.'), 0)
     finish = (grid[-1].index('.'), len(grid) - 1)

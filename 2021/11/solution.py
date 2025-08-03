@@ -25,8 +25,8 @@ while first_synchronized_flash is None or step <= 100:
     while queue:
         (x, y) = queue.pop()
 
-        for ny in range(max(0, y-1), min(len(grid), y+2)):
-            for nx in range(max(0, x-1), min(len(grid[ny]), x+2)):
+        for ny in range(max(0, y - 1), min(len(grid), y + 2)):
+            for nx in range(max(0, x - 1), min(len(grid[ny]), x + 2)):
                 neighbor = (nx, ny)
 
                 grid[neighbor[1]][neighbor[0]] += 1
@@ -36,7 +36,7 @@ while first_synchronized_flash is None or step <= 100:
                     queue.add(neighbor)
 
     # Reset power level to 0 for flashing fields
-    for (x, y) in flashes:
+    for x, y in flashes:
         grid[y][x] = 0
 
     # Keep track of flashing statistics

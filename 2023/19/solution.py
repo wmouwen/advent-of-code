@@ -23,7 +23,9 @@ def is_accepted(part: dict[str, int]) -> bool:
 
             assert isinstance(rule, Rule)
             ref = part[rule.category]
-            if (rule.operator == '>' and ref > rule.threshold) or (rule.operator == '<' and ref < rule.threshold):
+            if (rule.operator == '>' and ref > rule.threshold) or (
+                rule.operator == '<' and ref < rule.threshold
+            ):
                 current_rule = rule.target
                 break
 
@@ -38,23 +40,32 @@ for line in sys.stdin:
     name, rules = re.match(r'^(?P<name>\w+)\{(?P<rules>.*?)}$', line.strip()).groups()
     workflows[name] = []
     for rule in rules.split(','):
-        if match := re.match(r'^(?P<category>\w+)(?P<operator>[<>])(?P<threshold>\w+):(?P<target>\w+)$', rule):
-            workflows[name].append(Rule(
-                category=match.group('category'),
-                operator=match.group('operator'),
-                threshold=int(match.group('threshold')),
-                target=match.group('target')
-            ))
+        if match := re.match(
+            r'^(?P<category>\w+)(?P<operator>[<>])(?P<threshold>\w+):(?P<target>\w+)$',
+            rule,
+        ):
+            workflows[name].append(
+                Rule(
+                    category=match.group('category'),
+                    operator=match.group('operator'),
+                    threshold=int(match.group('threshold')),
+                    target=match.group('target'),
+                )
+            )
         else:
             workflows[name].append(rule)
 
 sum_ratings = 0
 for line in sys.stdin:
-    match = re.match(r'^\{x=(?P<x>\d+),m=(?P<m>\d+),a=(?P<a>\d+),s=(?P<s>\d+)}$', line.strip())
-    part = {'x': int(match.group('x')),
-            'm': int(match.group('m')),
-            'a': int(match.group('a')),
-            's': int(match.group('s'))}
+    match = re.match(
+        r'^\{x=(?P<x>\d+),m=(?P<m>\d+),a=(?P<a>\d+),s=(?P<s>\d+)}$', line.strip()
+    )
+    part = {
+        'x': int(match.group('x')),
+        'm': int(match.group('m')),
+        'a': int(match.group('a')),
+        's': int(match.group('s')),
+    }
 
     if is_accepted(part):
         sum_ratings += sum(part.values())
@@ -79,7 +90,10 @@ while not queue.empty():
                     if rule.threshold <= part[rule.category][1]:
                         # Condition partially met
                         new_part = part.copy()
-                        new_part[rule.category] = (part[rule.category][0], rule.threshold - 1)
+                        new_part[rule.category] = (
+                            part[rule.category][0],
+                            rule.threshold - 1,
+                        )
                         queue.put((new_part, rule.target))
                         part[rule.category] = (rule.threshold, part[rule.category][1])
                         continue
@@ -93,7 +107,10 @@ while not queue.empty():
                     if rule.threshold >= part[rule.category][0]:
                         # Condition partially met
                         new_part = part.copy()
-                        new_part[rule.category] = (rule.threshold + 1, part[rule.category][1])
+                        new_part[rule.category] = (
+                            rule.threshold + 1,
+                            part[rule.category][1],
+                        )
                         queue.put((new_part, rule.target))
                         part[rule.category] = (part[rule.category][0], rule.threshold)
                         continue

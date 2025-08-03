@@ -13,7 +13,7 @@ def main():
                 total += int(command[1]) * int(command[2])
                 if enabled:
                     total_enabled += int(command[1]) * int(command[2])
-            elif command[0] == 'don\'t()':
+            elif command[0] == "don't()":
                 enabled = False
             elif command[0] == 'do()':
                 enabled = True

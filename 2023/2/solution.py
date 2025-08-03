@@ -17,7 +17,9 @@ for line in sys.stdin:
             if int(cube_parts[0]) > cubes_available[cube_parts[1]]:
                 valid_game = False
 
-            cubes_minimal[cube_parts[1]] = max(cubes_minimal[cube_parts[1]], int(cube_parts[0]))
+            cubes_minimal[cube_parts[1]] = max(
+                cubes_minimal[cube_parts[1]], int(cube_parts[0])
+            )
 
     if valid_game:
         part1 += int(match['id'])

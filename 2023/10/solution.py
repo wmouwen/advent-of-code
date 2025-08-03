@@ -23,7 +23,11 @@ def start_symbol(grid: list[list[str]], start: Vector) -> str:
     up = start.y > 0 and grid[start.y - 1][start.x] in ['|', 'F', '7']
     left = start.x > 0 and grid[start.y][start.x - 1] in ['-', 'L', 'F']
     down = start.y < len(grid) - 1 and grid[start.y + 1][start.x] in ['|', 'L', 'J']
-    right = start.x < len(grid[start.y]) - 1 and grid[start.y][start.x + 1] in ['|', 'L', 'J']
+    right = start.x < len(grid[start.y]) - 1 and grid[start.y][start.x + 1] in [
+        '|',
+        'L',
+        'J',
+    ]
 
     if up and left:
         return 'J'

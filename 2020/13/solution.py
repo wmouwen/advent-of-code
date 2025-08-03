@@ -16,7 +16,9 @@ def main():
         if bus is None:
             continue
 
-        delay = int(bus) * (((earliest_departure - 1) // int(bus)) + 1) - earliest_departure
+        delay = (
+            int(bus) * (((earliest_departure - 1) // int(bus)) + 1) - earliest_departure
+        )
 
         if delay < earliest_departure_delay:
             earliest_departure_bus = bus

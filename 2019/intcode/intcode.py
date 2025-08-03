@@ -31,7 +31,9 @@ OutputCallback = Callable[[int], None]
 
 class IntcodeComputer:
     @staticmethod
-    def _split_instruction(instruction: Instruction) -> tuple[Opcode, tuple[ParameterMode, ...]]:
+    def _split_instruction(
+        instruction: Instruction,
+    ) -> tuple[Opcode, tuple[ParameterMode, ...]]:
         opcode = Opcode(instruction % 100)
         modes = (
             ParameterMode((instruction // 100) % 10),
@@ -42,10 +44,10 @@ class IntcodeComputer:
         return opcode, modes
 
     def __init__(
-            self,
-            program: list[Instruction | int],
-            input_callback: InputCallback = None,
-            output_callback: OutputCallback = None
+        self,
+        program: list[Instruction | int],
+        input_callback: InputCallback = None,
+        output_callback: OutputCallback = None,
     ):
         self.memory: Memory = dict(zip(range(len(program)), program))
         self.input_callback: InputCallback = input_callback
@@ -54,7 +56,9 @@ class IntcodeComputer:
         self.ip: MemoryAddress = 0x00
         self.relative_base: int = 0x00
 
-    def read(self, addr: MemoryAddress, mode: ParameterMode, target_write: bool = False) -> Instruction | int:
+    def read(
+        self, addr: MemoryAddress, mode: ParameterMode, target_write: bool = False
+    ) -> Instruction | int:
         if target_write:
             match mode:
                 case ParameterMode.POSITION:
@@ -64,7 +68,7 @@ class IntcodeComputer:
                 case ParameterMode.RELATIVE:
                     return self.relative_base + self.memory[addr]
                 case _:
-                    raise Exception(f"Unknown parameter mode: {mode}")
+                    raise Exception(f'Unknown parameter mode: {mode}')
 
         else:
             match mode:
@@ -75,7 +79,7 @@ class IntcodeComputer:
                 case ParameterMode.RELATIVE:
                     read_addr = self.relative_base + self.memory[addr]
                 case _:
-                    raise Exception(f"Unknown parameter mode: {mode}")
+                    raise Exception(f'Unknown parameter mode: {mode}')
 
             return self.memory[read_addr] if read_addr in self.memory else 0
 
@@ -84,27 +88,31 @@ class IntcodeComputer:
 
     def run(self):
         while True:
-            opcode, modes = self._split_instruction(self.read(self.ip, ParameterMode.IMMEDIATE))
+            opcode, modes = self._split_instruction(
+                self.read(self.ip, ParameterMode.IMMEDIATE)
+            )
 
             match opcode:
                 case Opcode.ADD:
                     self.write(
                         addr=self.read(self.ip + 0x03, modes[2], target_write=True),
-                        value=self.read(self.ip + 0x01, modes[0]) + self.read(self.ip + 0x02, modes[1])
+                        value=self.read(self.ip + 0x01, modes[0])
+                        + self.read(self.ip + 0x02, modes[1]),
                     )
                     self.ip += 0x04
 
                 case Opcode.MUL:
                     self.write(
                         addr=self.read(self.ip + 0x03, modes[2], target_write=True),
-                        value=self.read(self.ip + 0x01, modes[0]) * self.read(self.ip + 0x02, modes[1])
+                        value=self.read(self.ip + 0x01, modes[0])
+                        * self.read(self.ip + 0x02, modes[1]),
                     )
                     self.ip += 0x04
 
                 case Opcode.IN:
                     self.write(
                         addr=self.read(self.ip + 0x01, modes[0], target_write=True),
-                        value=self.input_callback()
+                        value=self.input_callback(),
                     )
                     self.ip += 0x02
 
@@ -127,14 +135,16 @@ class IntcodeComputer:
                 case Opcode.LT:
                     self.write(
                         addr=self.read(self.ip + 0x03, modes[2], target_write=True),
-                        value=self.read(self.ip + 0x01, modes[0]) < self.read(self.ip + 0x02, modes[1])
+                        value=self.read(self.ip + 0x01, modes[0])
+                        < self.read(self.ip + 0x02, modes[1]),
                     )
                     self.ip += 0x04
 
                 case Opcode.EQ:
                     self.write(
                         addr=self.read(self.ip + 0x03, modes[2], target_write=True),
-                        value=self.read(self.ip + 0x01, modes[0]) == self.read(self.ip + 0x02, modes[1])
+                        value=self.read(self.ip + 0x01, modes[0])
+                        == self.read(self.ip + 0x02, modes[1]),
                     )
                     self.ip += 0x04
 

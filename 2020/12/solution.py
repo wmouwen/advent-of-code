@@ -12,7 +12,7 @@ movements = {
     'E': Vector(x=1, y=0),
     'S': Vector(x=0, y=1),
     'W': Vector(x=-1, y=0),
-    'N': Vector(x=0, y=-1)
+    'N': Vector(x=0, y=-1),
 }
 directions = list(movements.keys())
 
@@ -31,7 +31,9 @@ class Ship:
         self.waypoint = Waypoint(dx=10, dy=-1)
 
     def rotate(self, degrees: int):
-        self.direction = directions[(directions.index(self.direction) + int(degrees // 90)) % len(directions)]
+        self.direction = directions[
+            (directions.index(self.direction) + int(degrees // 90)) % len(directions)
+        ]
         for _ in range(int(degrees // 90) % 4):
             self.waypoint.dx, self.waypoint.dy = -1 * self.waypoint.dy, self.waypoint.dx
 

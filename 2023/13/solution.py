@@ -16,7 +16,9 @@ def find_reflection(pattern: Pattern, smudges: int) -> int:
             bottom = pattern[pivot + 1 + offset]
 
             if top != bottom:
-                smudges_found = sum(1 for pair in zip(top, bottom) if pair[0] != pair[1])
+                smudges_found = sum(
+                    1 for pair in zip(top, bottom) if pair[0] != pair[1]
+                )
                 if smudges_found > smudges_left:
                     reflection = False
                     break
@@ -36,8 +38,12 @@ part2 = 0
 pattern: Pattern = []
 for line in map(lambda line: list(line.strip()), sys.stdin):
     if not line:
-        part1 += 100 * find_reflection(pattern, 0) + find_reflection(list(zip(*pattern)), 0)
-        part2 += 100 * find_reflection(pattern, 1) + find_reflection(list(zip(*pattern)), 1)
+        part1 += 100 * find_reflection(pattern, 0) + find_reflection(
+            list(zip(*pattern)), 0
+        )
+        part2 += 100 * find_reflection(pattern, 1) + find_reflection(
+            list(zip(*pattern)), 1
+        )
         pattern = []
     else:
         pattern.append(line)

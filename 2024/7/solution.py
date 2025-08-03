@@ -6,7 +6,7 @@ type Equation = tuple[int, list[int]]
 def calibrate(equations: list[Equation], with_concatenation: bool) -> int:
     calibration_result = 0
 
-    for (target, numbers) in equations:
+    for target, numbers in equations:
         outcomes = [numbers[0]]
 
         for i in range(1, len(numbers)):
@@ -35,10 +35,7 @@ def main():
 
     for line in sys.stdin:
         line_parts = line.strip().split(': ')
-        equations.append((
-            int(line_parts[0]),
-            list(map(int, line_parts[1].split(' ')))
-        ))
+        equations.append((int(line_parts[0]), list(map(int, line_parts[1].split(' ')))))
 
     print(calibrate(equations, False))
     print(calibrate(equations, True))

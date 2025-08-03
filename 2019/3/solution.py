@@ -6,7 +6,7 @@ dirs = {
     'R': Coord(x=1, y=0),
     'D': Coord(x=0, y=1),
     'L': Coord(x=-1, y=0),
-    'U': Coord(x=0, y=-1)
+    'U': Coord(x=0, y=-1),
 }
 
 wires = []

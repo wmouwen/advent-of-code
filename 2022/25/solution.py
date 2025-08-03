@@ -7,7 +7,8 @@ SNAFU_BASE = len(SNAFU_SYMBOLS)
 
 def snafu_to_dec(snafu: str) -> int:
     return sum(
-        (SNAFU_SYMBOLS.index(value) - SNAFU_OFFSET) * (SNAFU_BASE ** (len(snafu) - index - 1))
+        (SNAFU_SYMBOLS.index(value) - SNAFU_OFFSET)
+        * (SNAFU_BASE ** (len(snafu) - index - 1))
         for index, value in enumerate(snafu)
     )
 
@@ -24,7 +25,11 @@ def dec_to_snafu(dec: int) -> str:
 
 
 def main():
-    print(dec_to_snafu(sum(snafu_to_dec(snafu_number.strip()) for snafu_number in sys.stdin)))
+    print(
+        dec_to_snafu(
+            sum(snafu_to_dec(snafu_number.strip()) for snafu_number in sys.stdin)
+        )
+    )
 
 
 if __name__ == '__main__':

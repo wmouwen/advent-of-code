@@ -12,19 +12,46 @@ def positions_after_seconds(robots: list[Robot], seconds: int, space: Vector):
     return [
         Vector(
             x=(robot.position.x + robot.velocity.x * seconds) % space.x,
-            y=(robot.position.y + robot.velocity.y * seconds) % space.y
+            y=(robot.position.y + robot.velocity.y * seconds) % space.y,
         )
         for robot in robots
     ]
 
 
 def safety_factor(positions: list[Vector], space: Vector):
-    return reduce(lambda carry, item: carry * item, [
-        len([position for position in positions if position.x < space.x // 2 and position.y < space.y // 2]),
-        len([position for position in positions if position.x > space.x // 2 and position.y < space.y // 2]),
-        len([position for position in positions if position.x < space.x // 2 and position.y > space.y // 2]),
-        len([position for position in positions if position.x > space.x // 2 and position.y > space.y // 2]),
-    ])
+    return reduce(
+        lambda carry, item: carry * item,
+        [
+            len(
+                [
+                    position
+                    for position in positions
+                    if position.x < space.x // 2 and position.y < space.y // 2
+                ]
+            ),
+            len(
+                [
+                    position
+                    for position in positions
+                    if position.x > space.x // 2 and position.y < space.y // 2
+                ]
+            ),
+            len(
+                [
+                    position
+                    for position in positions
+                    if position.x < space.x // 2 and position.y > space.y // 2
+                ]
+            ),
+            len(
+                [
+                    position
+                    for position in positions
+                    if position.x > space.x // 2 and position.y > space.y // 2
+                ]
+            ),
+        ],
+    )
 
 
 def main():
@@ -33,10 +60,12 @@ def main():
     robots = []
     for line in sys.stdin:
         if match := re.match(r'p=(-?\d+),(-?\d+) v=(-?\d+),(-?\d+)', line.strip()):
-            robots.append(Robot(
-                position=Vector(x=int(match.group(1)), y=int(match.group(2))),
-                velocity=Vector(x=int(match.group(3)), y=int(match.group(4)))
-            ))
+            robots.append(
+                Robot(
+                    position=Vector(x=int(match.group(1)), y=int(match.group(2))),
+                    velocity=Vector(x=int(match.group(3)), y=int(match.group(4))),
+                )
+            )
 
     print(safety_factor(positions_after_seconds(robots, 100, space), space))
 
@@ -56,7 +85,10 @@ def main():
             best_y = t
 
     # t = best_x % space.x = best_y % space.y
-    print(best_x + ((pow(space.x, -1, mod=space.y) * (best_y - best_x)) % space.y) * space.x)
+    print(
+        best_x
+        + ((pow(space.x, -1, mod=space.y) * (best_y - best_x)) % space.y) * space.x
+    )
 
 
 if __name__ == '__main__':

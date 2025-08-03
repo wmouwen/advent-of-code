@@ -35,8 +35,8 @@ def fill_mask(mask: list[str]) -> list[str]:
     x_index = mask.index('X')
 
     return [
-        *fill_mask(mask[:x_index] + ['0'] + mask[x_index + 1:]),
-        *fill_mask(mask[:x_index] + ['1'] + mask[x_index + 1:])
+        *fill_mask(mask[:x_index] + ['0'] + mask[x_index + 1 :]),
+        *fill_mask(mask[:x_index] + ['1'] + mask[x_index + 1 :]),
     ]
 
 

@@ -48,7 +48,11 @@ class Conjunction(Module):
     def trigger(self, name: str, pulse: Pulse) -> Pulse | None:
         self.memory[name] = pulse
 
-        return Pulse.LOW if all(p == Pulse.HIGH for p in self.memory.values()) else Pulse.HIGH
+        return (
+            Pulse.LOW
+            if all(p == Pulse.HIGH for p in self.memory.values())
+            else Pulse.HIGH
+        )
 
     def reset(self) -> None:
         for name in self.memory:
@@ -77,7 +81,12 @@ for line in sys.stdin:
     elif name[0] == '&':
         modules[name[1:]] = Conjunction(destinations=destinations.split(', '))
 
-for name in [name for module in modules.values() for name in module.destinations if name not in modules]:
+for name in [
+    name
+    for module in modules.values()
+    for name in module.destinations
+    if name not in modules
+]:
     modules[name] = Output()
 
 for name, module in modules.items():

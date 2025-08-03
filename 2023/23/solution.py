@@ -20,15 +20,12 @@ allowed_moves = {
     'v': [Vector(x=0, y=1)],
     '<': [Vector(x=-1, y=0)],
     '^': [Vector(x=0, y=-1)],
-    '.': [Vector(x=1, y=0), Vector(x=0, y=1), Vector(x=-1, y=0), Vector(x=0, y=-1)]
+    '.': [Vector(x=1, y=0), Vector(x=0, y=1), Vector(x=-1, y=0), Vector(x=0, y=-1)],
 }
 
 
 def build_graph(grid, start: Vector, goal: Vector) -> Graph:
-    graph = {
-        start: Node(location=start),
-        goal: Node(location=goal)
-    }
+    graph = {start: Node(location=start), goal: Node(location=goal)}
 
     queue = Queue()
     queue.put((Vector(x=start.x, y=start.y + 1), start, graph[start], 1))
@@ -38,7 +35,9 @@ def build_graph(grid, start: Vector, goal: Vector) -> Graph:
 
         next_moves = []
         for move in allowed_moves[grid[current.y][current.x]]:
-            if not 0 <= current.y + move.y < len(grid) or not 0 <= current.x + move.x <= len(grid[current.y + move.y]):
+            if not 0 <= current.y + move.y < len(
+                grid
+            ) or not 0 <= current.x + move.x <= len(grid[current.y + move.y]):
                 continue
 
             if previous.y == current.y + move.y and previous.x == current.x + move.x:
@@ -65,7 +64,9 @@ def build_graph(grid, start: Vector, goal: Vector) -> Graph:
     return graph
 
 
-def find_longest_path(graph: Graph, goal: Vector, current: Vector, distance: int, visited: list[Node]) -> int:
+def find_longest_path(
+    graph: Graph, goal: Vector, current: Vector, distance: int, visited: list[Node]
+) -> int:
     if current == goal:
         return distance
 
@@ -74,7 +75,12 @@ def find_longest_path(graph: Graph, goal: Vector, current: Vector, distance: int
 
     for next_node, weight in graph[current].edges.items():
         if next_node not in visited:
-            longest = max(longest, find_longest_path(graph, goal, next_node.location, distance + weight, visited))
+            longest = max(
+                longest,
+                find_longest_path(
+                    graph, goal, next_node.location, distance + weight, visited
+                ),
+            )
 
     visited.remove(graph[current])
 
@@ -99,7 +105,10 @@ def main():
             other.edges[node] = weight
 
     previous_to_last_node, last_edge_weight = next(iter(graph[goal].edges.items()))
-    print(find_longest_path(graph, previous_to_last_node.location, start, 0, []) + last_edge_weight)
+    print(
+        find_longest_path(graph, previous_to_last_node.location, start, 0, [])
+        + last_edge_weight
+    )
 
 
 if __name__ == '__main__':

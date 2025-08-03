@@ -34,11 +34,27 @@ def find_shortest_paths(cells, start, end):
 
         if direction in cell.neighbors:
             neighbor = cell.neighbors[direction]
-            queue.put((distance + 1, neighbor.x, neighbor.y, direction, path + [(x, y, direction)]))
+            queue.put(
+                (
+                    distance + 1,
+                    neighbor.x,
+                    neighbor.y,
+                    direction,
+                    path + [(x, y, direction)],
+                )
+            )
 
         for turn in [-1, +1]:
             new_direction = dirs[(dirs.index(direction) + turn) % len(dirs)]
-            queue.put((distance + 1000, cell.x, cell.y, new_direction, path + [(x, y, direction)]))
+            queue.put(
+                (
+                    distance + 1000,
+                    cell.x,
+                    cell.y,
+                    new_direction,
+                    path + [(x, y, direction)],
+                )
+            )
 
     return shortest_paths, distances
 
@@ -50,11 +66,14 @@ def main():
     start, end = None, None
     for y, row in enumerate(grid):
         for x, cell in enumerate(row):
-            if cell == '#': continue
+            if cell == '#':
+                continue
 
             cells[x, y] = Cell(x, y)
-            if cell == 'S': start = cells[x, y]
-            if cell == 'E': end = cells[x, y]
+            if cell == 'S':
+                start = cells[x, y]
+            if cell == 'E':
+                end = cells[x, y]
 
             if (x - 1, y) in cells:
                 cells[x - 1, y].neighbors['E'] = cells[x, y]
@@ -68,16 +87,22 @@ def main():
 
     shortest_paths, distances = find_shortest_paths(cells, start, end)
 
-    min_distance = min(distance for (cell, _), distance in distances.items() if cell == end)
+    min_distance = min(
+        distance for (cell, _), distance in distances.items() if cell == end
+    )
     print(min_distance)
 
     fields_on_optimal_path = {(start.x, start.y), (end.x, end.y)}
     for direction in dirs:
-        if (end, direction) not in shortest_paths or distances[(end, direction)] > min_distance:
+        if (end, direction) not in shortest_paths or distances[
+            (end, direction)
+        ] > min_distance:
             continue
 
         for path in shortest_paths[(end, direction)]:
-            fields_on_optimal_path = fields_on_optimal_path.union(set((x, y) for (x, y, _) in path))
+            fields_on_optimal_path = fields_on_optimal_path.union(
+                set((x, y) for (x, y, _) in path)
+            )
 
     print(len(fields_on_optimal_path))
 

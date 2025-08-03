@@ -9,7 +9,12 @@ class Reaction:
         self.output_quantity = output_quantity
         self.ingredients = {}
 
-    def ore_required(self, amount_required: int, reactions: dict[str, Self], remainders: dict[str, int] = None) -> int:
+    def ore_required(
+        self,
+        amount_required: int,
+        reactions: dict[str, Self],
+        remainders: dict[str, int] = None,
+    ) -> int:
         if remainders is None:
             remainders = {}
         if self.name not in remainders:
@@ -21,7 +26,9 @@ class Reaction:
 
         amount_required -= remainders[self.name]
         reaction_multiplier = math.ceil(amount_required / self.output_quantity)
-        remainders[self.name] = reaction_multiplier * self.output_quantity - amount_required
+        remainders[self.name] = (
+            reaction_multiplier * self.output_quantity - amount_required
+        )
 
         return sum(
             reaction_multiplier * self.ingredients[ingredient_name]
@@ -29,7 +36,7 @@ class Reaction:
             else reactions[ingredient_name].ore_required(
                 amount_required=reaction_multiplier * self.ingredients[ingredient_name],
                 reactions=reactions,
-                remainders=remainders
+                remainders=remainders,
             )
             for ingredient_name in self.ingredients
         )
@@ -50,7 +57,9 @@ def main():
 
         reactions[reaction.name] = reaction
 
-    ore_for_single_fuel = reactions['FUEL'].ore_required(amount_required=1, reactions=reactions)
+    ore_for_single_fuel = reactions['FUEL'].ore_required(
+        amount_required=1, reactions=reactions
+    )
     print(ore_for_single_fuel)
 
     goal = 1000000000000
@@ -59,7 +68,10 @@ def main():
 
     while left < right - 1:
         mid = (left + right) // 2
-        if reactions['FUEL'].ore_required(amount_required=mid, reactions=reactions) <= goal:
+        if (
+            reactions['FUEL'].ore_required(amount_required=mid, reactions=reactions)
+            <= goal
+        ):
             left = mid
         else:
             right = mid

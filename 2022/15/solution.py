@@ -25,11 +25,18 @@ class Sensor(NamedTuple):
         return abs(self.y - y)
 
     def position_is_in_range(self, position: Vector) -> int:
-        return abs(self.x - position.x) + abs(self.y - position.y) <= self.distance_to_beacon()
+        return (
+            abs(self.x - position.x) + abs(self.y - position.y)
+            <= self.distance_to_beacon()
+        )
 
     def x_in_range_for_y(self, y: int) -> tuple[int, int] | None:
         range_offset = self.distance_to_beacon() - self.distance_to_row(y)
-        return (self.x - range_offset, self.x + range_offset) if range_offset >= 0 else None
+        return (
+            (self.x - range_offset, self.x + range_offset)
+            if range_offset >= 0
+            else None
+        )
 
     def unreachable_edge(self) -> Generator[Vector, Any, None]:
         offset_x = self.distance_to_beacon() + 1
@@ -61,19 +68,23 @@ class Grid:
     sensors: set[Sensor] = set()
 
     def ranges_for_row(self, y: int) -> list[tuple[int, int]]:
-        return sorted(filter(
-            lambda value: value is not None,
-            [sensor.x_in_range_for_y(y) for sensor in self.sensors]
-        ))
+        return sorted(
+            filter(
+                lambda value: value is not None,
+                [sensor.x_in_range_for_y(y) for sensor in self.sensors],
+            )
+        )
 
     def beacons_in_range(self, y: int) -> int:
         ranges = self.ranges_for_row(y)
 
-        return len([
-            1
-            for beacon in self.beacons
-            if beacon.y == y and any(r[0] <= beacon.x <= r[1] for r in ranges)
-        ])
+        return len(
+            [
+                1
+                for beacon in self.beacons
+                if beacon.y == y and any(r[0] <= beacon.x <= r[1] for r in ranges)
+            ]
+        )
 
     def free_positions_in_row(self, y: int) -> int:
         ranges = self.ranges_for_row(y)
@@ -96,11 +107,17 @@ def main():
     for line in sys.stdin:
         match = re.match(
             r'Sensor at x=(?P<s_x>\d+), y=(?P<s_y>\d+): closest beacon is at x=(?P<b_x>\d+), y=(?P<b_y>\d+)',
-            line.strip()
+            line.strip(),
         )
         if match:
-            grid.beacons.add(beacon := Beacon(y=int(match.group('b_y')), x=int(match.group('b_x'))))
-            grid.sensors.add(Sensor(y=int(match.group('s_y')), x=int(match.group('s_x')), beacon=beacon))
+            grid.beacons.add(
+                beacon := Beacon(y=int(match.group('b_y')), x=int(match.group('b_x')))
+            )
+            grid.sensors.add(
+                Sensor(
+                    y=int(match.group('s_y')), x=int(match.group('s_x')), beacon=beacon
+                )
+            )
 
     # y_target = 10
     y_target = 2000000
@@ -109,7 +126,9 @@ def main():
 
     for sensor in grid.sensors:
         for position in sensor.unreachable_edge():
-            if not (0 <= position.x <= y_target * 2 and 0 <= position.y <= y_target * 2):
+            if not (
+                0 <= position.x <= y_target * 2 and 0 <= position.y <= y_target * 2
+            ):
                 continue
 
             if any(other.position_is_in_range(position) for other in grid.sensors):

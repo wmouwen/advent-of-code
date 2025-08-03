@@ -1,7 +1,14 @@
 import sys
 
 
-def traverse(graph: dict, source: str, sink: str, revisits: int, current: str = None, visited: list = None) -> int:
+def traverse(
+    graph: dict,
+    source: str,
+    sink: str,
+    revisits: int,
+    current: str = None,
+    visited: list = None,
+) -> int:
     current = current if current is not None else source
     visited = visited if visited is not None else []
 
@@ -17,7 +24,10 @@ def traverse(graph: dict, source: str, sink: str, revisits: int, current: str = 
     if current.islower():
         visited.append(current)
 
-    paths = sum(traverse(graph, source, sink, revisits, target, visited) for target in graph[current])
+    paths = sum(
+        traverse(graph, source, sink, revisits, target, visited)
+        for target in graph[current]
+    )
 
     if current in visited:
         visited.remove(current)

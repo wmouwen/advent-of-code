@@ -15,7 +15,9 @@ for line in sys.stdin:
 while True:
     source, destination = random.sample(list(graph.nodes), 2)
 
-    cut_size, (group_source, group_destination) = minimum_cut(graph, source, destination)
+    cut_size, (group_source, group_destination) = minimum_cut(
+        graph, source, destination
+    )
     if cut_size == 3:
         print(len(group_source) * len(group_destination))
         break

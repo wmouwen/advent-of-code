@@ -38,7 +38,7 @@ for line in sys.stdin:
         break
 
     for i in range(len(line) - 1):
-        pair = line[i:i + 2]
+        pair = line[i : i + 2]
 
         if pair not in pairs:
             pairs[pair] = 0

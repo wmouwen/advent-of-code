@@ -2,7 +2,9 @@ import os
 import re
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../device')))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../device'))
+)
 from device import Device, Operation
 
 
@@ -13,17 +15,31 @@ def main():
     three_or_more_candidates_count = 0
 
     while True:
-        before = re.match(r'^Before: \[(-?\d+), (-?\d+), (-?\d+), (-?\d+)]$', sys.stdin.readline().strip())
+        before = re.match(
+            r'^Before: \[(-?\d+), (-?\d+), (-?\d+), (-?\d+)]$',
+            sys.stdin.readline().strip(),
+        )
         if not before:
             break
 
         before = list(map(int, before.groups()))
-        instruction = list(map(int, re.match(
-            r'^(-?\d+) (-?\d+) (-?\d+) (-?\d+)$',
-            sys.stdin.readline().strip()).groups()))
-        after = list(map(int, re.match(
-            r'^After:  \[(-?\d+), (-?\d+), (-?\d+), (-?\d+)]$',
-            sys.stdin.readline().strip()).groups()))
+        instruction = list(
+            map(
+                int,
+                re.match(
+                    r'^(-?\d+) (-?\d+) (-?\d+) (-?\d+)$', sys.stdin.readline().strip()
+                ).groups(),
+            )
+        )
+        after = list(
+            map(
+                int,
+                re.match(
+                    r'^After:  \[(-?\d+), (-?\d+), (-?\d+), (-?\d+)]$',
+                    sys.stdin.readline().strip(),
+                ).groups(),
+            )
+        )
 
         # Clear empty line
         sys.stdin.readline()
@@ -52,13 +68,17 @@ def main():
                 if needle in opcodes[other]:
                     opcodes[other].remove(needle)
 
-    opcode_map = {opcode: list(candidates)[0] for opcode, candidates in enumerate(opcodes)}
+    opcode_map = {
+        opcode: list(candidates)[0] for opcode, candidates in enumerate(opcodes)
+    }
 
     device = Device(register_count=4)
     for line in sys.stdin:
         if match := re.match(r'^(-?\d+) (-?\d+) (-?\d+) (-?\d+)$', line.strip()):
             operation = opcode_map[int(match.group(1))]
-            device.execute(operation, int(match.group(2)), int(match.group(3)), int(match.group(4)))
+            device.execute(
+                operation, int(match.group(2)), int(match.group(3)), int(match.group(4))
+            )
 
     print(device.registers[0])
 

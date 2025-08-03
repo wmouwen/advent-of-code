@@ -3,9 +3,9 @@ import sys
 
 def find_marker_pos(datastream: str, length: int) -> int:
     for marker in range(length, len(datastream)):
-        if len(set(datastream[marker - length:marker])) == length:
+        if len(set(datastream[marker - length : marker])) == length:
             return marker
-    raise Exception("No markers found")
+    raise Exception('No markers found')
 
 
 datastream = sys.stdin.readline().strip()

@@ -1,12 +1,17 @@
 [project]
 name = "wmouwen.advent-of-code"
 version = "0.dev"
-authors = [
-    { name = "Willem Mouwen" }
-]
-description = "Personal solutions to the problems published by the Advent of Code yearly events"
-requires-python = "~= 3.13"
 dependencies = [
     "pip ~= 25.2",
-    "networkx ~= 3.5"
+    "networkx ~= 3.5",
+    "ruff ~= 0.12",
 ]
+requires-python = "~= 3.13"
+authors = [
+    { name = "Willem Mouwen", email = "willem@mouwen.dev" },
+]
+description = "Personal solutions to the problems published by the Advent of Code yearly events"
+readme = "README.md"
+
+[tool.ruff.format]
+quote-style = "single"

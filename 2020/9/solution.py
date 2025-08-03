@@ -11,7 +11,7 @@ def has_combination(numbers: list, target: int) -> bool:
 
 def first_invalid_number(numbers: list, set_size: int = 25) -> int:
     for i in range(set_size, len(numbers)):
-        candidates = numbers[i - set_size:i]
+        candidates = numbers[i - set_size : i]
         if has_combination(candidates, numbers[i]):
             continue
 

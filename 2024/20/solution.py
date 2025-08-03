@@ -7,7 +7,9 @@ dirs = [V(0, -1), V(1, 0), V(0, 1), V(-1, 0)]
 
 
 def floodfill(grid: list[list[str]], origin: V):
-    distances: list[list[int | None]] = [[None for _ in range(len(grid[y]))] for y, _ in enumerate(grid)]
+    distances: list[list[int | None]] = [
+        [None for _ in range(len(grid[y]))] for y, _ in enumerate(grid)
+    ]
     distances[origin.y][origin.x] = 0
 
     queue = Queue()
@@ -28,7 +30,9 @@ def floodfill(grid: list[list[str]], origin: V):
     return distances
 
 
-def cheat_count(distances: list[list[int | None]], start: V, max_length: int, min_profit: int) -> int:
+def cheat_count(
+    distances: list[list[int | None]], start: V, max_length: int, min_profit: int
+) -> int:
     count = 0
 
     queue = Queue()
@@ -39,8 +43,15 @@ def cheat_count(distances: list[list[int | None]], start: V, max_length: int, mi
         for dy in range(-1 * max_length, max_length + 1):
             for dx in range(-1 * max_length + abs(dy), max_length + 1 - abs(dy)):
                 n = V(x=c.x + dx, y=c.y + dy)
-                if 0 <= n.y < len(distances) and 0 <= n.x < len(distances[n.y]) and distances[n.y][n.x] is not None:
-                    if distances[c.y][c.x] - distances[n.y][n.x] - abs(dy) - abs(dx) >= min_profit:
+                if (
+                    0 <= n.y < len(distances)
+                    and 0 <= n.x < len(distances[n.y])
+                    and distances[n.y][n.x] is not None
+                ):
+                    if (
+                        distances[c.y][c.x] - distances[n.y][n.x] - abs(dy) - abs(dx)
+                        >= min_profit
+                    ):
                         count += 1
 
         if distances[c.y][c.x] <= min_profit:
@@ -61,8 +72,10 @@ def main():
 
     for y, row in enumerate(grid):
         for x, cell in enumerate(row):
-            if cell == 'S': start = V(x, y)
-            if cell == 'E': end = V(x, y)
+            if cell == 'S':
+                start = V(x, y)
+            if cell == 'E':
+                end = V(x, y)
 
     assert isinstance(start, V) and isinstance(end, V)
     distances = floodfill(grid, end)

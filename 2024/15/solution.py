@@ -36,37 +36,55 @@ class Grid:
         return boxes_to_move
 
     def blocked_by_wall_horizontally(self, boxes_to_move, dx, stretch):
-        return ((self.robot[0] + dx, self.robot[1]) in self.walls
-                or any((x + dx * (1 if dx < 0 else stretch), y) in self.walls for x, y in boxes_to_move))
+        return (self.robot[0] + dx, self.robot[1]) in self.walls or any(
+            (x + dx * (1 if dx < 0 else stretch), y) in self.walls
+            for x, y in boxes_to_move
+        )
 
     def blocked_by_wall_vertically(self, boxes_to_move, dy, stretch):
-        return ((self.robot[0], self.robot[1] + dy) in self.walls
-                or any((x + dx, y + dy) in self.walls for x, y in boxes_to_move for dx in range(stretch)))
+        return (self.robot[0], self.robot[1] + dy) in self.walls or any(
+            (x + dx, y + dy) in self.walls
+            for x, y in boxes_to_move
+            for dx in range(stretch)
+        )
 
     def move(self, instruction, stretch=1):
         if instruction == '<':
             boxes_to_move = self.find_horizontal_targets(dx=-1, stretch=stretch)
-            if self.blocked_by_wall_horizontally(boxes_to_move, dx=-1, stretch=stretch): return
-            self.boxes = self.boxes.difference(boxes_to_move).union((x - 1, y) for x, y in boxes_to_move)
+            if self.blocked_by_wall_horizontally(boxes_to_move, dx=-1, stretch=stretch):
+                return
+            self.boxes = self.boxes.difference(boxes_to_move).union(
+                (x - 1, y) for x, y in boxes_to_move
+            )
             self.robot = (self.robot[0] - 1, self.robot[1])
 
         elif instruction == '>':
             boxes_to_move = self.find_horizontal_targets(dx=1, stretch=stretch)
-            if self.blocked_by_wall_horizontally(boxes_to_move, dx=1, stretch=stretch): return
-            self.boxes = self.boxes.difference(boxes_to_move).union((x + 1, y) for x, y in boxes_to_move)
+            if self.blocked_by_wall_horizontally(boxes_to_move, dx=1, stretch=stretch):
+                return
+            self.boxes = self.boxes.difference(boxes_to_move).union(
+                (x + 1, y) for x, y in boxes_to_move
+            )
             self.robot = (self.robot[0] + 1, self.robot[1])
 
         elif instruction == '^':
             boxes_to_move = self.find_vertical_targets(dy=-1, stretch=stretch)
-            if self.blocked_by_wall_vertically(boxes_to_move, dy=-1, stretch=stretch): return
-            self.boxes = self.boxes.difference(boxes_to_move).union((x, y - 1) for x, y in boxes_to_move)
+            if self.blocked_by_wall_vertically(boxes_to_move, dy=-1, stretch=stretch):
+                return
+            self.boxes = self.boxes.difference(boxes_to_move).union(
+                (x, y - 1) for x, y in boxes_to_move
+            )
             self.robot = (self.robot[0], self.robot[1] - 1)
 
         elif instruction == 'v':
             boxes_to_move = self.find_vertical_targets(dy=1, stretch=stretch)
-            if self.blocked_by_wall_vertically(boxes_to_move, dy=1, stretch=stretch): return
-            self.boxes = self.boxes.difference(boxes_to_move).union((x, y + 1) for x, y in boxes_to_move)
+            if self.blocked_by_wall_vertically(boxes_to_move, dy=1, stretch=stretch):
+                return
+            self.boxes = self.boxes.difference(boxes_to_move).union(
+                (x, y + 1) for x, y in boxes_to_move
+            )
             self.robot = (self.robot[0], self.robot[1] + 1)
+
 
 dirs = {'^': (0, -1), '>': (1, 0), 'v': (0, 1), '<': (-1, 0)}
 
@@ -80,23 +98,27 @@ def build_grid(inp, stretch=1):
                 for s in range(stretch):
                     grid.walls.add((x * stretch + s, y))
 
-            if cell == 'O': grid.boxes.add((x * stretch, y))
-            if cell == '@': grid.robot = (x * stretch, y)
+            if cell == 'O':
+                grid.boxes.add((x * stretch, y))
+            if cell == '@':
+                grid.robot = (x * stretch, y)
 
-    if grid.robot is None: raise Exception('No robot found')
+    if grid.robot is None:
+        raise Exception('No robot found')
 
     return grid
-
-
 
 
 def main():
     inp = []
     for line in sys.stdin:
-        if line.strip() == '': break
+        if line.strip() == '':
+            break
         inp.append(line.strip())
 
-    instructions = list(instruction for line in sys.stdin for instruction in line.strip())
+    instructions = list(
+        instruction for line in sys.stdin for instruction in line.strip()
+    )
 
     grid = build_grid(inp)
     for instruction in instructions:

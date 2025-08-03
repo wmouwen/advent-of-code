@@ -34,7 +34,12 @@ def parse_instructions(lines: list[str]) -> tuple[list[Instruction], int | None]
 
         if match := re.match(r'^(\w+) (-?\d+) (-?\d+) (-?\d+)$', line.strip()):
             instructions.append(
-                (Operation[match.group(1)], int(match.group(2)), int(match.group(3)), int(match.group(4)))
+                (
+                    Operation[match.group(1)],
+                    int(match.group(2)),
+                    int(match.group(3)),
+                    int(match.group(4)),
+                )
             )
 
     return instructions, ip_register
@@ -48,10 +53,10 @@ class Device:
     _bind_instruction_pointer: int
 
     def __init__(
-            self,
-            register_count: int,
-            instructions: list[Instruction] = None,
-            ip_register: int = None
+        self,
+        register_count: int,
+        instructions: list[Instruction] = None,
+        ip_register: int = None,
     ):
         self.registers = [0] * register_count
         self._instructions = instructions if instructions is not None else []
@@ -62,15 +67,22 @@ class Device:
         self._instruction_pointer = 0
 
     def run(self, halt_on_ip: int = None):
-        while 0 <= self._instruction_pointer < len(self._instructions) and halt_on_ip != self._instruction_pointer:
+        while (
+            0 <= self._instruction_pointer < len(self._instructions)
+            and halt_on_ip != self._instruction_pointer
+        ):
             if self._bind_instruction_pointer is not None:
-                self.registers[self._bind_instruction_pointer] = self._instruction_pointer
+                self.registers[self._bind_instruction_pointer] = (
+                    self._instruction_pointer
+                )
 
             # print(self._instructions[self._instruction_pointer], self.registers)
             self.execute(*self._instructions[self._instruction_pointer])
 
             if self._bind_instruction_pointer is not None:
-                self._instruction_pointer = self.registers[self._bind_instruction_pointer]
+                self._instruction_pointer = self.registers[
+                    self._bind_instruction_pointer
+                ]
 
             self._instruction_pointer += 1
 

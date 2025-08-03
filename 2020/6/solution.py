@@ -16,4 +16,9 @@ for line in sys.stdin:
     group_sizes[-1] += 1
 
 print(sum(len(group) for group in groups))
-print(sum(len(set(filter(lambda q: group[q] == group_sizes[index], group))) for index, group in enumerate(groups)))
+print(
+    sum(
+        len(set(filter(lambda q: group[q] == group_sizes[index], group)))
+        for index, group in enumerate(groups)
+    )
+)

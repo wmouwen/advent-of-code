@@ -14,9 +14,15 @@ def evolve(grid_old):
                 if nx != x or ny != y
             ]
 
-            if grid_old[y][x] == '.' and sum(1 for neighbor in neighbors if neighbor == '|') >= 3:
+            if (
+                grid_old[y][x] == '.'
+                and sum(1 for neighbor in neighbors if neighbor == '|') >= 3
+            ):
                 grid_new[y][x] = '|'
-            elif grid_old[y][x] == '|' and sum(1 for neighbor in neighbors if neighbor == '#') >= 3:
+            elif (
+                grid_old[y][x] == '|'
+                and sum(1 for neighbor in neighbors if neighbor == '#') >= 3
+            ):
                 grid_new[y][x] = '#'
             elif grid_old[y][x] == '#' and not ('|' in neighbors and '#' in neighbors):
                 grid_new[y][x] = '.'
@@ -27,8 +33,9 @@ def evolve(grid_old):
 
 
 def resource_value(grid):
-    return (sum(1 for row in grid for field in row if field == '#')
-            * sum(1 for row in grid for field in row if field == '|'))
+    return sum(1 for row in grid for field in row if field == '#') * sum(
+        1 for row in grid for field in row if field == '|'
+    )
 
 
 def main():
@@ -45,7 +52,9 @@ def main():
 
         hash = ''.join([''.join(row) for row in grid])
         if hash in visited:
-            tick += (tick - visited[hash]) * ((1000000000 - tick) // (tick - visited[hash]))
+            tick += (tick - visited[hash]) * (
+                (1000000000 - tick) // (tick - visited[hash])
+            )
 
         visited[hash] = tick
 

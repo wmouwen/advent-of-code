@@ -56,6 +56,8 @@ for input_line in sys.stdin:
     lines.append([start, end])
 
 
-orthogonalLines = list(filter(lambda line: line[0].x == line[1].x or line[0].y == line[1].y,lines))
+orthogonalLines = list(
+    filter(lambda line: line[0].x == line[1].x or line[0].y == line[1].y, lines)
+)
 print(amount_of_crossings(orthogonalLines))
 print(amount_of_crossings(lines))

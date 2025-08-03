@@ -9,19 +9,34 @@ class Tree:
         self.views = []
 
 
-trees = [list(map(lambda height: Tree(height=int(height)), list(line.strip()))) for line in sys.stdin]
+trees = [
+    list(map(lambda height: Tree(height=int(height)), list(line.strip())))
+    for line in sys.stdin
+]
 
 for y in range(len(trees)):
     for x in range(len(trees[y])):
         trees[y][x].visible = (
-                y == 0
-                or y == len(trees) - 1
-                or x == 0
-                or x == len(trees[y]) - 1
-                or not sum(1 for yi in range(0, y) if trees[yi][x].height >= trees[y][x].height)
-                or not sum(1 for yi in range(y + 1, len(trees)) if trees[yi][x].height >= trees[y][x].height)
-                or not sum(1 for xi in range(0, x) if trees[y][xi].height >= trees[y][x].height)
-                or not sum(1 for xi in range(x + 1, len(trees[y])) if trees[y][xi].height >= trees[y][x].height)
+            y == 0
+            or y == len(trees) - 1
+            or x == 0
+            or x == len(trees[y]) - 1
+            or not sum(
+                1 for yi in range(0, y) if trees[yi][x].height >= trees[y][x].height
+            )
+            or not sum(
+                1
+                for yi in range(y + 1, len(trees))
+                if trees[yi][x].height >= trees[y][x].height
+            )
+            or not sum(
+                1 for xi in range(0, x) if trees[y][xi].height >= trees[y][x].height
+            )
+            or not sum(
+                1
+                for xi in range(x + 1, len(trees[y]))
+                if trees[y][xi].height >= trees[y][x].height
+            )
         )
 
         visible = True
@@ -64,5 +79,18 @@ for y in range(len(trees)):
         trees[y][x].visible = trees[y][x].visible or visible
         trees[y][x].views.append(view)
 
-print(sum(1 for y in range(len(trees)) for x in range(len(trees[y])) if trees[y][x].visible))
-print(max(math.prod(trees[y][x].views) for y in range(len(trees)) for x in range(len(trees[y]))))
+print(
+    sum(
+        1
+        for y in range(len(trees))
+        for x in range(len(trees[y]))
+        if trees[y][x].visible
+    )
+)
+print(
+    max(
+        math.prod(trees[y][x].views)
+        for y in range(len(trees))
+        for x in range(len(trees[y]))
+    )
+)

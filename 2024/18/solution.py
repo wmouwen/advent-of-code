@@ -5,7 +5,9 @@ dirs = [(0, -1), (1, 0), (0, 1), (-1, 0)]
 
 
 def floodfill(grid):
-    distances: list[list[int | None]] = [[None for _ in range(len(grid))] for _ in range(len(grid))]
+    distances: list[list[int | None]] = [
+        [None for _ in range(len(grid))] for _ in range(len(grid))
+    ]
     distances[0][0] = 0
 
     queue = Queue()

@@ -10,8 +10,16 @@ class Monkey:
         self.right: str = right
 
     def value(self, monkeys: dict[str, Self | int]) -> int:
-        left = monkeys[self.left] if isinstance(monkeys[self.left], int) else monkeys[self.left].value(monkeys)
-        right = monkeys[self.right] if isinstance(monkeys[self.right], int) else monkeys[self.right].value(monkeys)
+        left = (
+            monkeys[self.left]
+            if isinstance(monkeys[self.left], int)
+            else monkeys[self.left].value(monkeys)
+        )
+        right = (
+            monkeys[self.right]
+            if isinstance(monkeys[self.right], int)
+            else monkeys[self.right].value(monkeys)
+        )
 
         match self.operator:
             case '+':
@@ -33,7 +41,9 @@ def main():
 
     for line in sys.stdin:
         if match := re.match(r'(\w+): (\w+) (.) (\w+)', line):
-            monkeys[match.group(1)] = Monkey(left=match.group(2), operator=match.group(3), right=match.group(4))
+            monkeys[match.group(1)] = Monkey(
+                left=match.group(2), operator=match.group(3), right=match.group(4)
+            )
         elif match := re.match(r'(\w+): (\d+)', line):
             monkeys[match.group(1)] = int(match.group(2))
 

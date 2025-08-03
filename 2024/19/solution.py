@@ -11,7 +11,7 @@ def towel_arrangements(pattern: str, towels: tuple):
     count = 0
     for towel in towels:
         if pattern.startswith(towel):
-            count += towel_arrangements(pattern[len(towel):], towels)
+            count += towel_arrangements(pattern[len(towel) :], towels)
 
     return count
 

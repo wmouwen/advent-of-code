@@ -14,7 +14,7 @@ class Unit:
         self.hp = 200
 
     def __repr__(self):
-        return "{} [{}, {}]".format(type(self).__name__, self.pos, self.hp)
+        return '{} [{}, {}]'.format(type(self).__name__, self.pos, self.hp)
 
 
 class Elf(Unit):
@@ -26,33 +26,34 @@ class Goblin(Unit):
 
 
 def play(grid, attack_power):
-    walls = [
-        [True if cell == '#' else False for cell in row]
-        for row in grid
-    ]
+    walls = [[True if cell == '#' else False for cell in row] for row in grid]
 
     units = [
-                Elf(Vector(x=x, y=y), attack_power=attack_power)
-                for y, row in enumerate(grid)
-                for x, cell in enumerate(row)
-                if cell == 'E'
-            ] + [
-                Goblin(Vector(x=x, y=y), attack_power=3)
-                for y, row in enumerate(grid)
-                for x, cell in enumerate(row)
-                if cell == 'G'
-            ]
+        Elf(Vector(x=x, y=y), attack_power=attack_power)
+        for y, row in enumerate(grid)
+        for x, cell in enumerate(row)
+        if cell == 'E'
+    ] + [
+        Goblin(Vector(x=x, y=y), attack_power=3)
+        for y, row in enumerate(grid)
+        for x, cell in enumerate(row)
+        if cell == 'G'
+    ]
 
     combat_rounds = 0
     while len(units) and not all(isinstance(unit, type(units[0])) for unit in units):
         combat_rounds += 1
 
-        playing_order = sorted(units, key=lambda unit: unit.pos.y * len(grid[0]) + unit.pos.x)
+        playing_order = sorted(
+            units, key=lambda unit: unit.pos.y * len(grid[0]) + unit.pos.x
+        )
         for unit in playing_order:
             if unit not in units:
                 continue
 
-            all_targets = [target for target in units if not isinstance(target, type(unit))]
+            all_targets = [
+                target for target in units if not isinstance(target, type(unit))
+            ]
             neighboring_targets = [
                 target
                 for target in all_targets
@@ -63,35 +64,51 @@ def play(grid, attack_power):
                 target_squares = [
                     Vector(x=target.pos.x + move.x, y=target.pos.y + move.y)
                     for target in all_targets
-                    for move in [Vector(x=0, y=-1), Vector(x=-1, y=0), Vector(x=1, y=0), Vector(x=0, y=1)]
-                    if not walls[target.pos.y + move.y][target.pos.x + move.x] and not any([
-                        target.pos.x + move.x == other.pos.x
-                        and target.pos.y + move.y == other.pos.y
-                        for other in units
-                    ])
+                    for move in [
+                        Vector(x=0, y=-1),
+                        Vector(x=-1, y=0),
+                        Vector(x=1, y=0),
+                        Vector(x=0, y=1),
+                    ]
+                    if not walls[target.pos.y + move.y][target.pos.x + move.x]
+                    and not any(
+                        [
+                            target.pos.x + move.x == other.pos.x
+                            and target.pos.y + move.y == other.pos.y
+                            for other in units
+                        ]
+                    )
                 ]
 
-                visited: list[list[tuple | None]] = [[None for _ in row] for row in grid]
+                visited: list[list[tuple | None]] = [
+                    [None for _ in row] for row in grid
+                ]
                 visited[unit.pos.y][unit.pos.x] = (0, None)
                 queue = [unit.pos]
                 while len(queue):
                     current = queue.pop(0)
-                    for move in [Vector(x=0, y=-1), Vector(x=-1, y=0), Vector(x=1, y=0), Vector(x=0, y=1)]:
+                    for move in [
+                        Vector(x=0, y=-1),
+                        Vector(x=-1, y=0),
+                        Vector(x=1, y=0),
+                        Vector(x=0, y=1),
+                    ]:
                         if visited[current.y + move.y][current.x + move.x]:
                             continue
 
                         if walls[current.y + move.y][current.x + move.x]:
                             continue
 
-                        if (any(
-                                current.x + move.x == other.pos.x and current.y + move.y == other.pos.y
-                                for other in units
-                        )):
+                        if any(
+                            current.x + move.x == other.pos.x
+                            and current.y + move.y == other.pos.y
+                            for other in units
+                        ):
                             continue
 
                         visited[current.y + move.y][current.x + move.x] = (
                             visited[current.y][current.x][0] + 1,
-                            current
+                            current,
                         )
                         queue.append(Vector(x=current.x + move.x, y=current.y + move.y))
 
@@ -101,14 +118,19 @@ def play(grid, attack_power):
                         reachable_squares.append(target_square)
 
                 if len(reachable_squares):
-                    reachable_squares.sort(key=lambda square: visited[square.y][square.x][0])
+                    reachable_squares.sort(
+                        key=lambda square: visited[square.y][square.x][0]
+                    )
                     nearest_squares = [
                         square
                         for square in reachable_squares
-                        if visited[square.y][square.x][0] == visited[reachable_squares[0].y][reachable_squares[0].x][0]
+                        if visited[square.y][square.x][0]
+                        == visited[reachable_squares[0].y][reachable_squares[0].x][0]
                     ]
 
-                    nearest_squares.sort(key=lambda square: square.y * len(grid[0]) + square.x)
+                    nearest_squares.sort(
+                        key=lambda square: square.y * len(grid[0]) + square.x
+                    )
 
                     chosen_square = nearest_squares[0]
                     while visited[chosen_square.y][chosen_square.x][1] != unit.pos:
@@ -131,7 +153,9 @@ def play(grid, attack_power):
                         if target.hp == neighboring_targets[0].hp
                     ]
 
-                neighboring_targets.sort(key=lambda target: target.pos.y * len(grid[0]) + target.pos.x)
+                neighboring_targets.sort(
+                    key=lambda target: target.pos.y * len(grid[0]) + target.pos.x
+                )
                 target = neighboring_targets[0]
 
                 target.hp -= unit.attack_power
@@ -145,7 +169,7 @@ def main():
     grid = [line.strip() for line in sys.stdin.readlines()]
 
     count_elves = sum(1 for row in grid for field in row if field == 'E')
-    assert (count_elves > 0)
+    assert count_elves > 0
 
     (combat_rounds, units) = play(grid=grid, attack_power=3)
     print((combat_rounds - 1) * sum(unit.hp for unit in units))

@@ -30,7 +30,9 @@ class Network:
             self.valves.pop(valve.name)
 
     def add_missing_edges(self):
-        while any(len(valve.tunnels) + 1 < len(self.valves) for valve in self.valves.values()):
+        while any(
+            len(valve.tunnels) + 1 < len(self.valves) for valve in self.valves.values()
+        ):
             for valve in self.valves.values():
                 tunnels = list(valve.tunnels.items())
                 for a, a_dist in tunnels:
@@ -45,11 +47,11 @@ class Network:
 
 
 def pressure_release(
-        network: Network,
-        location: str,
-        time_remaining: int,
-        open_valves: set[str],
-        released_pressure: int = 0
+    network: Network,
+    location: str,
+    time_remaining: int,
+    open_valves: set[str],
+    released_pressure: int = 0,
 ) -> int:
     max_pressure = released_pressure
 
@@ -61,23 +63,31 @@ def pressure_release(
         if new_time_remaining < 0:
             continue
 
-        max_pressure = max(max_pressure, pressure_release(
-            network=network,
-            location=new_location,
-            time_remaining=new_time_remaining,
-            open_valves=open_valves.union({location}),
-            released_pressure=released_pressure + network.valves[new_location].flow_rate * new_time_remaining,
-        ))
+        max_pressure = max(
+            max_pressure,
+            pressure_release(
+                network=network,
+                location=new_location,
+                time_remaining=new_time_remaining,
+                open_valves=open_valves.union({location}),
+                released_pressure=released_pressure
+                + network.valves[new_location].flow_rate * new_time_remaining,
+            ),
+        )
 
     return max_pressure
 
 
 def solo_walk(network, start):
-    return pressure_release(network, location=start, time_remaining=30, open_valves={start})
+    return pressure_release(
+        network, location=start, time_remaining=30, open_valves={start}
+    )
 
 
 def duo_walk(network, start):
-    targets = set(valve.name for valve in network.valves.values() if valve.name != start)
+    targets = set(
+        valve.name for valve in network.valves.values() if valve.name != start
+    )
     max_pressure = 0
 
     for size in range(ceil(len(targets) / 2) + 1):
@@ -86,13 +96,13 @@ def duo_walk(network, start):
                 network,
                 location=start,
                 time_remaining=26,
-                open_valves=set(combination).union({start})
+                open_valves=set(combination).union({start}),
             )
             elephant = pressure_release(
                 network,
                 location=start,
                 time_remaining=26,
-                open_valves=set(targets - set(combination)).union({start})
+                open_valves=set(targets - set(combination)).union({start}),
             )
 
             max_pressure = max(max_pressure, player + elephant)
@@ -106,13 +116,13 @@ def main():
 
     for line in sys.stdin:
         if match := re.match(
-                r'Valve (\w{2}) has flow rate=(\d+); tunnels? leads? to valves? ([\w, ]+)$',
-                line.strip()
+            r'Valve (\w{2}) has flow rate=(\d+); tunnels? leads? to valves? ([\w, ]+)$',
+            line.strip(),
         ):
             valve = Valve(
                 name=match.group(1),
                 flow_rate=int(match.group(2)),
-                tunnels={key: 1 for key in match.group(3).split(', ')}
+                tunnels={key: 1 for key in match.group(3).split(', ')},
             )
             network.valves[valve.name] = valve
         else:

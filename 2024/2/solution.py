@@ -6,10 +6,12 @@ def sign(num: int) -> int:
 
 
 def is_safe(levels: list[int]) -> bool:
-    if len(levels) < 2: return True
+    if len(levels) < 2:
+        return True
 
     slope = sign(levels[1] - levels[0])
-    if slope == 0: return False
+    if slope == 0:
+        return False
 
     for i in range(len(levels) - 1):
         if sign(levels[i + 1] - levels[i]) != slope:
@@ -23,7 +25,7 @@ def is_safe(levels: list[int]) -> bool:
 
 def is_safe_tolerated(levels: list[int]) -> bool:
     for i in range(len(levels)):
-        if is_safe(list(levels[:i] + levels[i + 1:])):
+        if is_safe(list(levels[:i] + levels[i + 1 :])):
             return True
 
     return False

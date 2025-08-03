@@ -25,10 +25,7 @@ class Packet:
 
     @classmethod
     def from_str(cls, message: str) -> Self:
-        packet = cls(
-            version=int(message[:3], 2),
-            type=PacketType(int(message[3:6], 2))
-        )
+        packet = cls(version=int(message[:3], 2), type=PacketType(int(message[3:6], 2)))
         packet.length = 6
 
         match packet.type:
@@ -36,7 +33,7 @@ class Packet:
                 value = ''
 
                 for pointer in range(6, len(message), 5):
-                    value += message[pointer + 1:pointer + 5]
+                    value += message[pointer + 1 : pointer + 5]
 
                     packet.length += 5
                     if message[pointer] == '0':
@@ -55,7 +52,9 @@ class Packet:
 
                         length_processed = 0
                         while length_processed < length_subpackets:
-                            packet.subpackets.append(cls.from_str(message[22 + length_processed:]))
+                            packet.subpackets.append(
+                                cls.from_str(message[22 + length_processed :])
+                            )
                             packet.length += packet.subpackets[-1].length
                             length_processed += packet.subpackets[-1].length
 
@@ -65,7 +64,9 @@ class Packet:
 
                         length_processed = 0
                         for _ in range(count_subpackets):
-                            packet.subpackets.append(cls.from_str(message[18 + length_processed:]))
+                            packet.subpackets.append(
+                                cls.from_str(message[18 + length_processed :])
+                            )
                             packet.length += packet.subpackets[-1].length
                             length_processed += packet.subpackets[-1].length
 
@@ -76,7 +77,9 @@ class Packet:
 
     @property
     def sum_versions(self) -> int:
-        return self.version + sum(subpacket.sum_versions for subpacket in self.subpackets)
+        return self.version + sum(
+            subpacket.sum_versions for subpacket in self.subpackets
+        )
 
     @property
     def value(self) -> int:
@@ -109,8 +112,7 @@ class Packet:
 def main():
     message_hexadecimal = sys.stdin.readline().strip()
     message_binary = '{input:{width}b}'.format(
-        input=int(message_hexadecimal, 16),
-        width=len(message_hexadecimal) * 4
+        input=int(message_hexadecimal, 16), width=len(message_hexadecimal) * 4
     )
 
     packet = Packet.from_str(message_binary)

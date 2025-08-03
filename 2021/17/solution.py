@@ -15,7 +15,9 @@ def reaches_target(x_min, x_max, y_min, y_max, vx, vy) -> bool:
     return False
 
 
-input = re.match(r'^target area: x=(\d+)..(\d+), y=(-\d+)..(-\d+)$', sys.stdin.read()).groups()
+input = re.match(
+    r'^target area: x=(\d+)..(\d+), y=(-\d+)..(-\d+)$', sys.stdin.read()
+).groups()
 (x_min, x_max, y_min, y_max) = (int(group) for group in input)
 
 possible_velocities = 0

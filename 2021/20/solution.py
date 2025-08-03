@@ -5,7 +5,11 @@ def evolve(lit, algorithm, cycle_nr):
     minx, maxx = min(p[0] for p in lit), max(p[0] for p in lit)
     miny, maxy = min(p[1] for p in lit), max(p[1] for p in lit)
     lit, prev = set(), lit
-    is_edge_lit = algorithm[0] and cycle_nr > 0 and not (cycle_nr & 1 == 0 and not algorithm[(1 << 9) - 1])
+    is_edge_lit = (
+        algorithm[0]
+        and cycle_nr > 0
+        and not (cycle_nr & 1 == 0 and not algorithm[(1 << 9) - 1])
+    )
 
     for y in range(miny - 1, maxy + 2):
         for x in range(minx - 1, maxx + 2):
@@ -14,7 +18,10 @@ def evolve(lit, algorithm, cycle_nr):
                 for dy in range(-1, 2)
                 for dx in range(-1, 2)
                 if (x + dx, y + dy) in prev
-                or (is_edge_lit and (not minx <= x + dx <= maxx or not miny <= y + dy <= maxy))
+                or (
+                    is_edge_lit
+                    and (not minx <= x + dx <= maxx or not miny <= y + dy <= maxy)
+                )
             )
 
             if algorithm[hash_value]:
@@ -24,7 +31,7 @@ def evolve(lit, algorithm, cycle_nr):
 
 
 def main():
-    algorithm = [cell == "#" for cell in sys.stdin.readline().strip()]
+    algorithm = [cell == '#' for cell in sys.stdin.readline().strip()]
     sys.stdin.readline()
 
     assert len(algorithm) == 1 << 9

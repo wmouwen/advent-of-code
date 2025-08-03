@@ -29,12 +29,16 @@ def main():
             prices.append(secret % 10)
             changes.append(prices[-1] - prices[-2])
 
-            if len(changes) >= 4 and (seq := tuple(changes[-4:])) not in sequences.keys():
+            if (
+                len(changes) >= 4
+                and (seq := tuple(changes[-4:])) not in sequences.keys()
+            ):
                 sequences[seq] = prices[-1]
 
         last_secret_sum += secret
 
-        for seq, price in sequences.items(): gains[seq] += price
+        for seq, price in sequences.items():
+            gains[seq] += price
 
     print(last_secret_sum)
     print(max(gain for gain in gains.values()))

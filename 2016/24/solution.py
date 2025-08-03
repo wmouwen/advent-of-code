@@ -8,12 +8,7 @@ class Vector(NamedTuple):
     y: int
 
 
-directions = (
-    Vector(x=1, y=0),
-    Vector(x=0, y=1),
-    Vector(x=-1, y=0),
-    Vector(x=0, y=-1)
-)
+directions = (Vector(x=1, y=0), Vector(x=0, y=1), Vector(x=-1, y=0), Vector(x=0, y=-1))
 
 
 def floodfill(grid: list[list[str]], start: Vector) -> list[list[int]]:
@@ -42,14 +37,16 @@ def floodfill(grid: list[list[str]], start: Vector) -> list[list[int]]:
 
 
 def hamiltonian_path(
-        edges: dict[str, dict[str, int]],
-        current: str,
-        visited: set[str],
-        final_node: str | None,
-        travelled: int = 0
+    edges: dict[str, dict[str, int]],
+    current: str,
+    visited: set[str],
+    final_node: str | None,
+    travelled: int = 0,
 ) -> int:
     if len(visited) == len(edges.keys()):
-        return travelled + (edges[current][final_node] if isinstance(final_node, str) else 0)
+        return travelled + (
+            edges[current][final_node] if isinstance(final_node, str) else 0
+        )
 
     best = sys.maxsize
 
@@ -57,7 +54,12 @@ def hamiltonian_path(
         if node in visited:
             continue
 
-        best = min(best, hamiltonian_path(edges, node, visited | {node}, final_node, travelled + distance))
+        best = min(
+            best,
+            hamiltonian_path(
+                edges, node, visited | {node}, final_node, travelled + distance
+            ),
+        )
 
     return best
 

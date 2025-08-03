@@ -1,7 +1,9 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../assembunny')))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../assembunny'))
+)
 from assembunny import AssembunnyComputer
 
 
@@ -19,7 +21,7 @@ def output_validate(computer: AssembunnyComputer, attempt: Attempt, value: int) 
 
     attempt.output_cycle += 1
 
-    if attempt.output_cycle == 8 ** 2:
+    if attempt.output_cycle == 8**2:
         computer.interrupt()
 
 
@@ -30,7 +32,7 @@ def main():
     while attempt.init < 10000:
         computer = AssembunnyComputer(
             instructions=instructions,
-            output_callback=lambda value: output_validate(computer, attempt, value)
+            output_callback=lambda value: output_validate(computer, attempt, value),
         )
         computer.write('a', attempt.init)
         computer.run()

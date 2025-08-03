@@ -23,10 +23,16 @@ class Grove:
         for elf in self.elves:
             proposal = elf
 
-            if any(Vector(elf.x + d.x, elf.y + d.y) in self.elves for move in legal_moves for d in move):
+            if any(
+                Vector(elf.x + d.x, elf.y + d.y) in self.elves
+                for move in legal_moves
+                for d in move
+            ):
                 for i in range(len(legal_moves)):
                     attempt = legal_moves[(i + self.rounds_passed) % len(legal_moves)]
-                    if any(Vector(elf.x + d.x, elf.y + d.y) in self.elves for d in attempt):
+                    if any(
+                        Vector(elf.x + d.x, elf.y + d.y) in self.elves for d in attempt
+                    ):
                         continue
 
                     proposal = Vector(elf.x + attempt[1].x, elf.y + attempt[1].y)

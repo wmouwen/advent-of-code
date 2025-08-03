@@ -23,11 +23,10 @@ def find_loop_size(public_key: int):
 
 
 def main():
-    print(transform(
-        int(sys.stdin.readline()),
-        find_loop_size(int(sys.stdin.readline()))
-    ))
+    print(
+        transform(int(sys.stdin.readline()), find_loop_size(int(sys.stdin.readline())))
+    )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

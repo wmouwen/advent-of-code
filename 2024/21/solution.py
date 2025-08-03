@@ -49,10 +49,16 @@ def calc_paths(pad: dict):
 
             d = pad[b] - pad[a]
             if d.x != 0 and pad[a] + V(x=d.x, y=0) in pad.values():
-                paths[a][b].append(('>' if d.x > 0 else '<') * abs(d.x) + ('v' if d.y > 0 else '^') * abs(d.y))
+                paths[a][b].append(
+                    ('>' if d.x > 0 else '<') * abs(d.x)
+                    + ('v' if d.y > 0 else '^') * abs(d.y)
+                )
 
             if d.y != 0 and pad[a] + V(x=0, y=d.y) in pad.values():
-                paths[a][b].append(('v' if d.y > 0 else '^') * abs(d.y) + ('>' if d.x > 0 else '<') * abs(d.x))
+                paths[a][b].append(
+                    ('v' if d.y > 0 else '^') * abs(d.y)
+                    + ('>' if d.x > 0 else '<') * abs(d.x)
+                )
 
     return paths
 
@@ -80,7 +86,9 @@ def min_presses(code, max_depth, depth=0):
         return len(code)
 
     return sum(
-        min(min_presses(path + 'A', max_depth, depth + 1) for path in KEYPAD_PATHS[a][b])
+        min(
+            min_presses(path + 'A', max_depth, depth + 1) for path in KEYPAD_PATHS[a][b]
+        )
         for a, b in pairwise('A' + code)
     )
 
@@ -95,8 +103,12 @@ def main():
 
         paths = numpad_to_keypad(code)
 
-        complexity_part_one += numeric_part * min(min_presses(path, 2) for path in paths)
-        complexity_part_two += numeric_part * min(min_presses(path, 25) for path in paths)
+        complexity_part_one += numeric_part * min(
+            min_presses(path, 2) for path in paths
+        )
+        complexity_part_two += numeric_part * min(
+            min_presses(path, 25) for path in paths
+        )
 
     print(complexity_part_one)
     print(complexity_part_two)

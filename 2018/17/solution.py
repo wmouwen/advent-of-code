@@ -33,8 +33,12 @@ def main():
                 grid[int(matches[1])][x] = '#'
 
     grid[0][500] = '+'
-    x_min = min(x for y, row in enumerate(grid) for x, field in enumerate(row) if field == '#')
-    x_max = max(x for y, row in enumerate(grid) for x, field in enumerate(row) if field == '#')
+    x_min = min(
+        x for y, row in enumerate(grid) for x, field in enumerate(row) if field == '#'
+    )
+    x_max = max(
+        x for y, row in enumerate(grid) for x, field in enumerate(row) if field == '#'
+    )
     y_min = min(y for y, row in enumerate(grid) for field in row if field == '#')
     y_max = max(y for y, row in enumerate(grid) for field in row if field == '#')
 
@@ -44,10 +48,17 @@ def main():
             Coord(y=y, x=x)
             for y in range(0, y_max + 1)
             for x in range(x_min - 1, x_max + 2)
-            if grid[y][x] in ['+', '|'] and (
-                    grid[y + 1][x] == '.'
-                    or (grid[y + 1][x] in ['~', '#'] and (grid[y][x - 1] == '.' or grid[y][x + 1] == '.'))
-                    or (grid[y + 1][x] in ['~', '#'] and (grid[y][x - 1] == '#' and grid[y][x + 1] == '#'))
+            if grid[y][x] in ['+', '|']
+            and (
+                grid[y + 1][x] == '.'
+                or (
+                    grid[y + 1][x] in ['~', '#']
+                    and (grid[y][x - 1] == '.' or grid[y][x + 1] == '.')
+                )
+                or (
+                    grid[y + 1][x] in ['~', '#']
+                    and (grid[y][x - 1] == '#' and grid[y][x + 1] == '#')
+                )
             )
         ]
 
@@ -57,7 +68,10 @@ def main():
         current = candidates[0]
 
         # Move downwards
-        while current.below().y <= y_max + 1 and grid[current.below().y][current.below().x] == '.':
+        while (
+            current.below().y <= y_max + 1
+            and grid[current.below().y][current.below().x] == '.'
+        ):
             current = current.below()
             grid[current.y][current.x] = '|'
 
@@ -89,8 +103,18 @@ def main():
     #         print(grid[y][x], end='')
     #     print()
 
-    flowing = sum(1 for y in range(y_min, y_max + 1) for x in range(x_min - 1, x_max + 2) if grid[y][x] == '|')
-    still = sum(1 for y in range(y_min, y_max + 1) for x in range(x_min - 1, x_max + 2) if grid[y][x] == '~')
+    flowing = sum(
+        1
+        for y in range(y_min, y_max + 1)
+        for x in range(x_min - 1, x_max + 2)
+        if grid[y][x] == '|'
+    )
+    still = sum(
+        1
+        for y in range(y_min, y_max + 1)
+        for x in range(x_min - 1, x_max + 2)
+        if grid[y][x] == '~'
+    )
 
     print(flowing + still)
     print(still)

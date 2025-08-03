@@ -10,12 +10,16 @@ def main():
     constellations = [
         [tuple(map(int, line.strip().split(',')))]
         for line in sys.stdin
-        if line.strip() != ""
+        if line.strip() != ''
     ]
 
     for i in range(len(constellations)):
         for j in range(i + 1, len(constellations)):
-            if any(distance(a, b) <= 3 for a in constellations[i] for b in constellations[j]):
+            if any(
+                distance(a, b) <= 3
+                for a in constellations[i]
+                for b in constellations[j]
+            ):
                 constellations[j].extend(constellations[i])
                 constellations[i] = None
                 break

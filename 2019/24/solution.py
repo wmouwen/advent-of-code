@@ -23,13 +23,19 @@ def evolve_plain(bugs: set[V]) -> set[V]:
             else:
                 empty_neighbors[neighbor] += 1
 
-    return ({
-        cell for cell, active_neighbors in bug_neighbors.items()
-        if 0 <= cell.x < 5 and 0 <= cell.y < 5 and active_neighbors == 1
-    }).union({
-        cell for cell, active_neighbors in empty_neighbors.items()
-        if 0 <= cell.x < 5 and 0 <= cell.y < 5 and 1 <= active_neighbors <= 2
-    })
+    return (
+        {
+            cell
+            for cell, active_neighbors in bug_neighbors.items()
+            if 0 <= cell.x < 5 and 0 <= cell.y < 5 and active_neighbors == 1
+        }
+    ).union(
+        {
+            cell
+            for cell, active_neighbors in empty_neighbors.items()
+            if 0 <= cell.x < 5 and 0 <= cell.y < 5 and 1 <= active_neighbors <= 2
+        }
+    )
 
 
 def find_repetition_rating(bugs: set[V]) -> int:
@@ -94,13 +100,19 @@ def evolve_layered(bugs: set[V]) -> set[V]:
             else:
                 empty_neighbors[neighbor] += 1
 
-    return ({
-        cell for cell, active_neighbors in bug_neighbors.items()
-        if 0 <= cell.x < 5 and 0 <= cell.y < 5 and active_neighbors == 1
-    }).union({
-        cell for cell, active_neighbors in empty_neighbors.items()
-        if 0 <= cell.x < 5 and 0 <= cell.y < 5 and 1 <= active_neighbors <= 2
-    })
+    return (
+        {
+            cell
+            for cell, active_neighbors in bug_neighbors.items()
+            if 0 <= cell.x < 5 and 0 <= cell.y < 5 and active_neighbors == 1
+        }
+    ).union(
+        {
+            cell
+            for cell, active_neighbors in empty_neighbors.items()
+            if 0 <= cell.x < 5 and 0 <= cell.y < 5 and 1 <= active_neighbors <= 2
+        }
+    )
 
 
 def main():

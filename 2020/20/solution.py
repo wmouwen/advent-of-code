@@ -20,20 +20,23 @@ def map_tile_edges(tile_grids):
         line = line.replace('.', '0').replace('#', '1')
         return int(line, 2)
 
-    return {key: (
-        (  # Normal: NESW, clockwise
-            line_to_int(grid[0]),
-            line_to_int(''.join(grid[y][-1] for y in range(len(grid)))),
-            line_to_int(grid[-1][::-1]),
-            line_to_int(''.join(grid[y][0] for y in range(len(grid)))[::-1]),
-        ),
-        (  # Reversed: NWSE, counter-clockwise
-            line_to_int(grid[0][::-1]),
-            line_to_int(''.join(grid[y][0] for y in range(len(grid)))),
-            line_to_int(grid[-1]),
-            line_to_int(''.join(grid[y][-1] for y in range(len(grid)))[::-1]),
+    return {
+        key: (
+            (  # Normal: NESW, clockwise
+                line_to_int(grid[0]),
+                line_to_int(''.join(grid[y][-1] for y in range(len(grid)))),
+                line_to_int(grid[-1][::-1]),
+                line_to_int(''.join(grid[y][0] for y in range(len(grid)))[::-1]),
+            ),
+            (  # Reversed: NWSE, counter-clockwise
+                line_to_int(grid[0][::-1]),
+                line_to_int(''.join(grid[y][0] for y in range(len(grid)))),
+                line_to_int(grid[-1]),
+                line_to_int(''.join(grid[y][-1] for y in range(len(grid)))[::-1]),
+            ),
         )
-    ) for key, grid in tile_grids.items()}
+        for key, grid in tile_grids.items()
+    }
 
 
 def map_neighbours(tile_edges) -> dict:
@@ -65,11 +68,19 @@ def main():
     neighbours = map_neighbours(tile_edges)
 
     # Assert puzzle input has a single possible layout
-    num_edges_found = sum(1 for v in neighbours.values() for o in v for e in o if e is not None)
-    num_edges_required = 2 * 4 + 3 * (picture_size - 2) * 4 + 4 * (picture_size - 2) * (picture_size - 2)
+    num_edges_found = sum(
+        1 for v in neighbours.values() for o in v for e in o if e is not None
+    )
+    num_edges_required = (
+        2 * 4 + 3 * (picture_size - 2) * 4 + 4 * (picture_size - 2) * (picture_size - 2)
+    )
     assert num_edges_found == num_edges_required * 2
 
-    corners = {k: v for k, v in neighbours.items() if len([1 for a in v for b in a if b is not None]) == 2 * 2}
+    corners = {
+        k: v
+        for k, v in neighbours.items()
+        if len([1 for a in v for b in a if b is not None]) == 2 * 2
+    }
     print(prod(corners.keys()))
 
     # print(*neighbours.items(), sep='\n')

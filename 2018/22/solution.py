@@ -26,14 +26,19 @@ def main():
             elif x == 0:
                 geologic_indexes[y][x] = y * 48271
             else:
-                geologic_indexes[y][x] = (erosion_levels[y - 1][x] * erosion_levels[y][x - 1]) % lcm
+                geologic_indexes[y][x] = (
+                    erosion_levels[y - 1][x] * erosion_levels[y][x - 1]
+                ) % lcm
 
             erosion_levels[y][x] = (geologic_indexes[y][x] + depth) % 20183
             region_type[y][x] = erosion_levels[y][x] % 3
 
-    print(sum(sum(row[0:target_x + 1]) for row in region_type[0:target_y + 1]))
+    print(sum(sum(row[0 : target_x + 1]) for row in region_type[0 : target_y + 1]))
 
-    distances = [[[sys.maxsize, sys.maxsize, sys.maxsize] for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+    distances = [
+        [[sys.maxsize, sys.maxsize, sys.maxsize] for _ in range(GRID_SIZE)]
+        for _ in range(GRID_SIZE)
+    ]
     distances[0][0] = [0, 0, 0]
     target_distance = sys.maxsize
 
@@ -47,7 +52,9 @@ def main():
             continue
 
         if x == target_x and y == target_y:
-            target_distance = min(distance + (7 if forbidden_type != 1 else 0), target_distance)
+            target_distance = min(
+                distance + (7 if forbidden_type != 1 else 0), target_distance
+            )
             continue
 
         for nx, ny in [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]:
@@ -63,7 +70,9 @@ def main():
             if new_distance >= distances[ny][nx][new_forbidden_type]:
                 continue
 
-            distances[ny][nx][new_forbidden_type] = min(distances[ny][nx][new_forbidden_type], new_distance)
+            distances[ny][nx][new_forbidden_type] = min(
+                distances[ny][nx][new_forbidden_type], new_distance
+            )
             queue.put((new_distance, ny, nx, new_forbidden_type))
 
     print(target_distance)

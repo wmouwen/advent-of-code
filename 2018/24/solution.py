@@ -15,23 +15,36 @@ class Group:
     def from_string(cls, party: Party, line: str) -> Self:
         match = re.match(
             r'(\d+) units each with (\d+) hit points (\(.+\))?\s?with an attack that does (\d+) (\w+) damage at initiative (\d+)',
-            line.strip()
+            line.strip(),
         )
 
         weaknesses, immunities = [], []
-        for power, types in re.findall('(weak|immune) to ([^;)]*)', match.group(3) or ''):
+        for power, types in re.findall(
+            '(weak|immune) to ([^;)]*)', match.group(3) or ''
+        ):
             (weaknesses if power == 'weak' else immunities).extend(types.split(', '))
 
         return cls(
-            party=party, units=int(match.group(1)), hit_points=int(match.group(2)),
-            initiative=int(match.group(6)), attack_damage=int(match.group(4)), attack_type=match.group(5),
-            weaknesses=weaknesses, immunities=immunities,
+            party=party,
+            units=int(match.group(1)),
+            hit_points=int(match.group(2)),
+            initiative=int(match.group(6)),
+            attack_damage=int(match.group(4)),
+            attack_type=match.group(5),
+            weaknesses=weaknesses,
+            immunities=immunities,
         )
 
     def __init__(
-            self, party: Party, units: int, hit_points: int,
-            initiative: int, attack_damage: int, attack_type: str,
-            weaknesses: list[str], immunities: list[str]
+        self,
+        party: Party,
+        units: int,
+        hit_points: int,
+        initiative: int,
+        attack_damage: int,
+        attack_type: str,
+        weaknesses: list[str],
+        immunities: list[str],
     ):
         # State
         self.party = party
@@ -52,24 +65,32 @@ class Group:
         return self.units * self.attack_damage
 
     def power_against(self, target: Self) -> int:
-        if self.attack_type in target.immunities: return 0
-        if self.attack_type in target.weaknesses: return 2 * self.effective_power
+        if self.attack_type in target.immunities:
+            return 0
+        if self.attack_type in target.weaknesses:
+            return 2 * self.effective_power
         return self.effective_power
 
     def __repr__(self):
-        return f'Group({self.party}, units={self.units}, hit_points={self.hit_points}, attack_type={self.attack_type}, immunities=[{', '.join(self.immunities)}])'
+        return f'Group({self.party}, units={self.units}, hit_points={self.hit_points}, attack_type={self.attack_type}, immunities=[{", ".join(self.immunities)}])'
 
 
 def select_targets(groups: list[Group]) -> dict[Group, Group]:
     targets = dict()
 
-    for attacker in sorted(groups, key=lambda group: (group.effective_power, group.initiative), reverse=True):
+    for attacker in sorted(
+        groups,
+        key=lambda group: (group.effective_power, group.initiative),
+        reverse=True,
+    ):
         defenders = [
             defender
             for defender in groups
-            if (attacker.party != defender.party and
-                attacker.attack_type not in defender.immunities and
-                defender not in targets.values())
+            if (
+                attacker.party != defender.party
+                and attacker.attack_type not in defender.immunities
+                and defender not in targets.values()
+            )
         ]
 
         if not defenders:
@@ -77,8 +98,12 @@ def select_targets(groups: list[Group]) -> dict[Group, Group]:
 
         targets[attacker] = sorted(
             defenders,
-            key=lambda defender: (attacker.power_against(defender), defender.effective_power, defender.initiative),
-            reverse=True
+            key=lambda defender: (
+                attacker.power_against(defender),
+                defender.effective_power,
+                defender.initiative,
+            ),
+            reverse=True,
         )[0]
 
     return targets
@@ -110,7 +135,8 @@ def combat(groups: list[Group], boost: int = 0) -> list[Group]:
 
         # Infinite loop preventions
         total_units = sum(group.units for group in groups)
-        if prev_total_units == total_units: break
+        if prev_total_units == total_units:
+            break
         prev_total_units = total_units
 
     return groups
@@ -121,12 +147,14 @@ def main():
 
     sys.stdin.readline()
     for line in sys.stdin:
-        if line.strip() == '': break
+        if line.strip() == '':
+            break
         groups.append(Group.from_string(Party.IMMUNE_SYSTEM, line))
 
     sys.stdin.readline()
     for line in sys.stdin:
-        if line.strip() == '': break
+        if line.strip() == '':
+            break
         groups.append(Group.from_string(Party.INFECTION, line))
 
     survivors = combat(groups)

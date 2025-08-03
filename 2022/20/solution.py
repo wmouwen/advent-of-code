@@ -16,7 +16,10 @@ def mix(encrypted: list[int], rounds: int) -> list[int]:
 
 
 def coordinates(decrypted: list[int]):
-    return (decrypted[(decrypted.index(0) + offset) % len(decrypted)] for offset in (1000, 2000, 3000))
+    return (
+        decrypted[(decrypted.index(0) + offset) % len(decrypted)]
+        for offset in (1000, 2000, 3000)
+    )
 
 
 def main():

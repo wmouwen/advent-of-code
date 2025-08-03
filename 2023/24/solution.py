@@ -19,12 +19,12 @@ class Hailstone:
     def from_str(cls, definition: str) -> Self:
         x, y, z, vx, vy, vz = re.match(
             pattern=r'(-?\d+),\s+(-?\d+),\s+(-?\d+)\s+@\s+(-?\d+),\s+(-?\d+),\s+(-?\d+)',
-            string=definition
+            string=definition,
         ).groups()
 
         return cls(
             start=Vector(x=int(x), y=int(y), z=int(z)),
-            velocity=Vector(x=int(vx), y=int(vy), z=int(vz))
+            velocity=Vector(x=int(vx), y=int(vy), z=int(vz)),
         )
 
     @property
@@ -39,7 +39,9 @@ class Hailstone:
         if self.xy_slope == other.xy_slope:
             return None
 
-        x = (other.xy_y_intercept - self.xy_y_intercept) / (self.xy_slope - other.xy_slope)
+        x = (other.xy_y_intercept - self.xy_y_intercept) / (
+            self.xy_slope - other.xy_slope
+        )
         y = self.xy_slope * x + self.xy_y_intercept
 
         return Vector(x=x, y=y)
@@ -61,7 +63,10 @@ for i, hailstone in enumerate(hailstones):
         if intersection is None:
             continue
 
-        if not test_area[0] <= intersection.x <= test_area[1] or not test_area[0] <= intersection.y <= test_area[1]:
+        if (
+            not test_area[0] <= intersection.x <= test_area[1]
+            or not test_area[0] <= intersection.y <= test_area[1]
+        ):
             continue
 
         if not hailstone.in_future(intersection) or not other.in_future(intersection):
@@ -73,7 +78,7 @@ print(intersections)
 
 rock = Hailstone(
     start=Vector(Symbol('x'), Symbol('y'), Symbol('z')),
-    velocity=Vector(Symbol('vx'), Symbol('vy'), Symbol('vz'))
+    velocity=Vector(Symbol('vx'), Symbol('vy'), Symbol('vz')),
 )
 
 variables = [*rock.start, *rock.velocity]
@@ -81,11 +86,16 @@ equations = []
 
 for hailstone in hailstones[:3]:
     variables.append(time := Symbol(f'hailstone_{id(hailstone)}'))
-    equations.extend([
-        (rock.start.x + rock.velocity.x * time) - (hailstone.start.x + hailstone.velocity.x * time),
-        (rock.start.y + rock.velocity.y * time) - (hailstone.start.y + hailstone.velocity.y * time),
-        (rock.start.z + rock.velocity.z * time) - (hailstone.start.z + hailstone.velocity.z * time)
-    ])
+    equations.extend(
+        [
+            (rock.start.x + rock.velocity.x * time)
+            - (hailstone.start.x + hailstone.velocity.x * time),
+            (rock.start.y + rock.velocity.y * time)
+            - (hailstone.start.y + hailstone.velocity.y * time),
+            (rock.start.z + rock.velocity.z * time)
+            - (hailstone.start.z + hailstone.velocity.z * time),
+        ]
+    )
 
 solved_system = solve_poly_system(equations, variables)
 print(sum(solved_system[0][:3]))

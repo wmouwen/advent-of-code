@@ -47,9 +47,13 @@ def defragment_files(disk: Disk) -> Disk:
     index = len(disk) - 1
 
     while index >= 0:
-        if isinstance(disk[index], File) and (disk[index - 1] is None or disk[index - 1].id != disk[index].id):
+        if isinstance(disk[index], File) and (
+            disk[index - 1] is None or disk[index - 1].id != disk[index].id
+        ):
             for candidate_start in range(index):
-                if not all(disk[candidate_start + b] is None for b in range(disk[index].size)):
+                if not all(
+                    disk[candidate_start + b] is None for b in range(disk[index].size)
+                ):
                     continue
 
                 for b in range(disk[index].size):

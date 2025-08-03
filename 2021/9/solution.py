@@ -30,8 +30,12 @@ def find_basin(height_map: list, low_point: tuple) -> list:
         basin.append((x, y))
 
         for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-            if 0 <= x + dx < len(height_map[y]) and 0 <= y + dy < len(height_map) \
-                    and not (x + dx, y + dy) in basin and not (x + dx, y + dy) in queue:
+            if (
+                0 <= x + dx < len(height_map[y])
+                and 0 <= y + dy < len(height_map)
+                and not (x + dx, y + dy) in basin
+                and not (x + dx, y + dy) in queue
+            ):
                 queue.append((x + dx, y + dy))
 
     return basin

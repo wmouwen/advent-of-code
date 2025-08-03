@@ -10,7 +10,9 @@ for line in sys.stdin:
     char, password = output.group(3, 4)
 
     valid_part_one += a <= password.count(char) <= b
-    valid_part_two += (password[a - 1] == char or password[b - 1] == char) and password[a - 1] != password[b - 1]
+    valid_part_two += (password[a - 1] == char or password[b - 1] == char) and password[
+        a - 1
+    ] != password[b - 1]
 
 print(valid_part_one)
 print(valid_part_two)

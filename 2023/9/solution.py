@@ -7,7 +7,12 @@ for line in sys.stdin:
     sequences = [[int(x) for x in line.split()]]
 
     while len([diff for diff in sequences[-1] if diff == 0]) < len(sequences[-1]):
-        sequences.append([sequences[-1][i + 1] - sequences[-1][i] for i in range(len(sequences[-1]) - 1)])
+        sequences.append(
+            [
+                sequences[-1][i + 1] - sequences[-1][i]
+                for i in range(len(sequences[-1]) - 1)
+            ]
+        )
 
     sequences[-1].append(0)
     sequences[-1].insert(0, 0)

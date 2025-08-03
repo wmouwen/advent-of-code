@@ -1,7 +1,9 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../intcode')))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../intcode'))
+)
 from intcode import IntcodeComputer
 
 dirs = [(0, -1), (1, 0), (0, 1), (-1, 0)]
@@ -10,8 +12,7 @@ dirs = [(0, -1), (1, 0), (0, 1), (-1, 0)]
 def build_grid(program):
     output = []
     computer = IntcodeComputer(
-        program=program,
-        output_callback=lambda value: output.append(value)
+        program=program, output_callback=lambda value: output.append(value)
     )
     computer.run()
 
@@ -24,7 +25,9 @@ def alignment_parameters(grid):
         for y in range(len(grid))
         for x in range(len(grid[y]))
         if all(
-            0 <= y + dy < len(grid) and 0 <= x + dx < len(grid[y + dy]) and grid[y + dy][x + dx] == '#'
+            0 <= y + dy < len(grid)
+            and 0 <= x + dx < len(grid[y + dy])
+            and grid[y + dy][x + dx] == '#'
             for dx, dy in dirs
         )
     ]
@@ -33,19 +36,35 @@ def alignment_parameters(grid):
 def extract_path(grid):
     path = []
 
-    x, y = [(x, y) for y in range(len(grid)) for x in range(len(grid[y])) if grid[y][x] == '^'][0]
+    x, y = [
+        (x, y)
+        for y in range(len(grid))
+        for x in range(len(grid[y]))
+        if grid[y][x] == '^'
+    ][0]
     d = 0
 
     while True:
         dx, dy = dirs[d]
 
-        if not (0 <= y + dy < len(grid) and 0 <= x + dx < len(grid[y + dy])) or grid[y + dy][x + dx] != '#':
+        if (
+            not (0 <= y + dy < len(grid) and 0 <= x + dx < len(grid[y + dy]))
+            or grid[y + dy][x + dx] != '#'
+        ):
             lx, ly = dirs[ld := ((d - 1) % len(dirs))]
             rx, ry = dirs[rd := ((d + 1) % len(dirs))]
-            if 0 <= y + ly < len(grid) and 0 <= x + lx < len(grid[y + ly]) and grid[y + ly][x + lx] == '#':
+            if (
+                0 <= y + ly < len(grid)
+                and 0 <= x + lx < len(grid[y + ly])
+                and grid[y + ly][x + lx] == '#'
+            ):
                 dx, dy, d = lx, ly, ld
                 path.extend(['L', 0])
-            elif 0 <= y + ry < len(grid) and 0 <= x + rx < len(grid[y + ry]) and grid[y + ry][x + rx] == '#':
+            elif (
+                0 <= y + ry < len(grid)
+                and 0 <= x + rx < len(grid[y + ry])
+                and grid[y + ry][x + rx] == '#'
+            ):
                 dx, dy, d = rx, ry, rd
                 path.extend(['R', 0])
             else:
@@ -82,11 +101,16 @@ def main():
     # print(path)
 
     instructions = [
-        *map(ord, path), ord('\n'),
-        *map(ord, functions['A']), ord('\n'),
-        *map(ord, functions['B']), ord('\n'),
-        *map(ord, functions['C']), ord('\n'),
-        ord('n'), ord('\n'),
+        *map(ord, path),
+        ord('\n'),
+        *map(ord, functions['A']),
+        ord('\n'),
+        *map(ord, functions['B']),
+        ord('\n'),
+        *map(ord, functions['C']),
+        ord('\n'),
+        ord('n'),
+        ord('\n'),
     ]
     # print(instructions)
 
@@ -94,7 +118,7 @@ def main():
     computer = IntcodeComputer(
         program=program,
         input_callback=lambda: instructions.pop(0),
-        output_callback=lambda value: output.append(value)
+        output_callback=lambda value: output.append(value),
     )
     computer.write(0x00, 2)
     computer.run()

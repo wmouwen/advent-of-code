@@ -4,7 +4,7 @@ import sys
 
 match = re.match(
     r'^(?P<players>\d+) players; last marble is worth (?P<max_marble>\d+) points$',
-    sys.stdin.readline().strip()
+    sys.stdin.readline().strip(),
 )
 
 scores = [0 for _ in range(int(match['players']))]

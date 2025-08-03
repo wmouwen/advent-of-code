@@ -1,13 +1,32 @@
 import re
 import sys
 
-face_values = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"]
-face_values_with_joker = ["A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", "J"]
+face_values = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2']
+face_values_with_joker = [
+    'A',
+    'K',
+    'Q',
+    'T',
+    '9',
+    '8',
+    '7',
+    '6',
+    '5',
+    '4',
+    '3',
+    '2',
+    'J',
+]
 
 
 def hand_value(cards: list[str]) -> int:
-    value = sum((pow(len(face_values), len(cards) - i - 1)
-                 * (len(cards) - face_values.index(cards[i]) - 1)) for i in range(len(cards)))
+    value = sum(
+        (
+            pow(len(face_values), len(cards) - i - 1)
+            * (len(cards) - face_values.index(cards[i]) - 1)
+        )
+        for i in range(len(cards))
+    )
 
     buckets = {}
     for card in cards:
@@ -32,14 +51,19 @@ def hand_value(cards: list[str]) -> int:
 
 
 def joker_value(cards: list[str]) -> int:
-    value = sum((pow(len(face_values_with_joker), len(cards) - i - 1)
-                 * (len(cards) - face_values_with_joker.index(cards[i]) - 1)) for i in range(len(cards)))
+    value = sum(
+        (
+            pow(len(face_values_with_joker), len(cards) - i - 1)
+            * (len(cards) - face_values_with_joker.index(cards[i]) - 1)
+        )
+        for i in range(len(cards))
+    )
 
     buckets = {}
     for card in cards:
         buckets[card] = buckets[card] + 1 if card in buckets else 1
 
-    jokers = buckets.pop("J") if "J" in buckets else 0
+    jokers = buckets.pop('J') if 'J' in buckets else 0
     sorted_buckets = sorted(buckets.items(), key=lambda x: x[1], reverse=True)
 
     if jokers == 5 or sorted_buckets[0][1] + jokers >= 5:

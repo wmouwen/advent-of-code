@@ -18,7 +18,7 @@ def compare_order(left: list[int | list], right: list[int | list]) -> int:
 
         sub_decision = compare_order(
             left=left[i] if isinstance(left[i], list) else [left[i]],
-            right=right[i] if isinstance(right[i], list) else [right[i]]
+            right=right[i] if isinstance(right[i], list) else [right[i]],
         )
 
         if sub_decision != 0:

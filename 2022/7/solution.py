@@ -15,7 +15,9 @@ class Directory:
         self.files = {}
 
     def size(self) -> int:
-        return sum(file.size for file in self.files.values()) + sum(dir.size() for dir in self.directories.values())
+        return sum(file.size for file in self.files.values()) + sum(
+            dir.size() for dir in self.directories.values()
+        )
 
     def sum_small_dirs(self) -> int:
         sum = 0

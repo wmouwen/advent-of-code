@@ -18,7 +18,7 @@ def main():
 
         food = Food(
             ingredients=set(match.group(1).split(' ')),
-            allergens=set(match.group(2).split(', '))
+            allergens=set(match.group(2).split(', ')),
         )
         foods.append(food)
 
@@ -44,7 +44,11 @@ def main():
             if len(allergens[allergen]) == 1:
                 allergen_known |= allergens[allergen]
 
-    print(','.join(next(iter(allergens[allergen])) for allergen in sorted(allergens.keys())))
+    print(
+        ','.join(
+            next(iter(allergens[allergen])) for allergen in sorted(allergens.keys())
+        )
+    )
 
 
 if __name__ == '__main__':

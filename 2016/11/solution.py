@@ -25,7 +25,10 @@ def allowed_floor(floor: Floor) -> bool:
         return True
 
     for component in floor:
-        if component.type == 'microchip' and Component(element=component.element, type='generator') not in floor:
+        if (
+            component.type == 'microchip'
+            and Component(element=component.element, type='generator') not in floor
+        ):
             return False
 
     return True
@@ -34,7 +37,7 @@ def allowed_floor(floor: Floor) -> bool:
 def move(state: State) -> Generator[State, Any, None]:
     possible_moves = chain(
         combinations(state.floors[state.elevator], r=2),
-        combinations(state.floors[state.elevator], r=1)
+        combinations(state.floors[state.elevator], r=1),
     )
 
     for move in possible_moves:
@@ -48,7 +51,9 @@ def move(state: State) -> Generator[State, Any, None]:
             floors[state.elevator] = floors[state.elevator].difference(move)
             floors[next_elevator] = floors[next_elevator].union(move)
 
-            if not allowed_floor(floors[state.elevator]) or not allowed_floor(floors[next_elevator]):
+            if not allowed_floor(floors[state.elevator]) or not allowed_floor(
+                floors[next_elevator]
+            ):
                 continue
 
             yield State(moves=state.moves + 1, elevator=next_elevator, floors=floors)
@@ -83,8 +88,12 @@ def least_moves(floors):
 
 def main():
     floors = [
-        {Component(element=element, type=type)
-         for element, type in re.findall(r'(\w+)(?:-compatible)? (microchip|generator)', line.strip())}
+        {
+            Component(element=element, type=type)
+            for element, type in re.findall(
+                r'(\w+)(?:-compatible)? (microchip|generator)', line.strip()
+            )
+        }
         for line in sys.stdin
     ]
 
@@ -94,7 +103,7 @@ def main():
         Component(element='elerium', type='generator'),
         Component(element='elerium', type='microchip'),
         Component(element='dilithium', type='generator'),
-        Component(element='dilithium', type='microchip')
+        Component(element='dilithium', type='microchip'),
     }
 
     print(least_moves(floors))

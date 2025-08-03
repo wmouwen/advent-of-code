@@ -5,7 +5,7 @@ import sys
 def fold(unfolded: set, axis: str, value: int) -> set:
     folded = set()
 
-    for (x, y) in unfolded:
+    for x, y in unfolded:
         if axis == 'x' and x > value:
             x = value - (x - value)
         if axis == 'y' and y > value:

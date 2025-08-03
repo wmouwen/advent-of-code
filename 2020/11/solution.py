@@ -43,8 +43,9 @@ def evolve(grid: Grid, max_distance: int | None) -> Grid:
                 dx, dy = direction.x, direction.y
 
                 while 0 <= y + dy < len(grid) and 0 <= x + dx < len(grid[y + dy]):
-
-                    if max_distance is not None and (abs(dx) > max_distance or abs(dy) > max_distance):
+                    if max_distance is not None and (
+                        abs(dx) > max_distance or abs(dy) > max_distance
+                    ):
                         break
 
                     occupied_neighbors += grid[y + dy][x + dx] == FieldState.OCCUPIED
@@ -56,18 +57,25 @@ def evolve(grid: Grid, max_distance: int | None) -> Grid:
 
             if field == FieldState.EMPTY and occupied_neighbors == 0:
                 evolution[y][x] = FieldState.OCCUPIED
-            elif field == FieldState.OCCUPIED and occupied_neighbors >= 5 - (max_distance is not None):
+            elif field == FieldState.OCCUPIED and occupied_neighbors >= 5 - (
+                max_distance is not None
+            ):
                 evolution[y][x] = FieldState.EMPTY
 
     return evolution
 
 
 def grid_hash(grid: Grid) -> str:
-    return '\n'.join(map(lambda row: ''.join(map(lambda field: field.value, row)), grid))
+    return '\n'.join(
+        map(lambda row: ''.join(map(lambda field: field.value, row)), grid)
+    )
 
 
 initial_grid: Grid = [
-    [FieldState.EMPTY if field == FieldState.EMPTY.value else FieldState.FLOOR for field in line]
+    [
+        FieldState.EMPTY if field == FieldState.EMPTY.value else FieldState.FLOOR
+        for field in line
+    ]
     for line in sys.stdin
 ]
 

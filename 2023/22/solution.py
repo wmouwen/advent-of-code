@@ -23,8 +23,16 @@ class Brick:
         a, b = map(lambda coord: coord.split(','), definition.split('~'))
 
         return cls(
-            top=Vector(x=max(int(a[0]), int(b[0])), y=max(int(a[1]), int(b[1])), z=max(int(a[2]), int(b[2]))),
-            bottom=Vector(x=min(int(a[0]), int(b[0])), y=min(int(a[1]), int(b[1])), z=min(int(a[2]), int(b[2])))
+            top=Vector(
+                x=max(int(a[0]), int(b[0])),
+                y=max(int(a[1]), int(b[1])),
+                z=max(int(a[2]), int(b[2])),
+            ),
+            bottom=Vector(
+                x=min(int(a[0]), int(b[0])),
+                y=min(int(a[1]), int(b[1])),
+                z=min(int(a[2]), int(b[2])),
+            ),
         )
 
     @property
@@ -36,9 +44,13 @@ class Brick:
         self.bottom.z -= distance
 
     def is_beneath(self, other: Self) -> bool:
-        return (self.top.x >= other.bottom.x and self.bottom.x <= other.top.x and
-                self.top.y >= other.bottom.y and self.bottom.y <= other.top.y and
-                self.top.z < other.bottom.z)
+        return (
+            self.top.x >= other.bottom.x
+            and self.bottom.x <= other.top.x
+            and self.top.y >= other.bottom.y
+            and self.bottom.y <= other.top.y
+            and self.top.z < other.bottom.z
+        )
 
     def supports(self, other: Self) -> bool:
         return self.is_beneath(other) and self.top.z == other.bottom.z - 1
@@ -52,11 +64,17 @@ def main():
         if brick.distance_to_ground == 0:
             continue
 
-        brick.fall(min(
-            sys.maxsize,
-            brick.distance_to_ground,
-            *(brick.bottom.z - other.top.z - 1 for other in bricks[:i] if other.is_beneath(brick))
-        ))
+        brick.fall(
+            min(
+                sys.maxsize,
+                brick.distance_to_ground,
+                *(
+                    brick.bottom.z - other.top.z - 1
+                    for other in bricks[:i]
+                    if other.is_beneath(brick)
+                ),
+            )
+        )
 
     for a, b in itertools.combinations(bricks, r=2):
         assert isinstance(a, Brick) and isinstance(b, Brick)
@@ -65,7 +83,10 @@ def main():
             a.supporting.add(b)
             b.supported_by.add(a)
 
-    safe_to_remove = sum(all(len(other.supported_by) != 1 for other in brick.supporting) for brick in bricks)
+    safe_to_remove = sum(
+        all(len(other.supported_by) != 1 for other in brick.supporting)
+        for brick in bricks
+    )
     print(safe_to_remove)
 
     disintegrating_sum = 0

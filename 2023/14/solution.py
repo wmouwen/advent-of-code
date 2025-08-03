@@ -53,7 +53,9 @@ def find_final_dish(dish: Dish, cycles: int) -> Dish:
 
 
 def load(dish: Dish) -> int:
-    return sum(len(dish) - y for y, row in enumerate(dish) for cell in row if cell == 'O')
+    return sum(
+        len(dish) - y for y, row in enumerate(dish) for cell in row if cell == 'O'
+    )
 
 
 dish: Dish = [line for line in map(lambda line: list(line.strip()), sys.stdin)]

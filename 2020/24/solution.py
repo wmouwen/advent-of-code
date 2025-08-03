@@ -13,8 +13,14 @@ class V(NamedTuple):
         return V(x=self.x + other.x, y=self.y + other.y)
 
 
-directions = {'e': V(x=2, y=0), 'se': V(x=1, y=1), 'sw': V(x=-1, y=1),
-              'w': V(x=-2, y=0), 'nw': V(x=-1, y=-1), 'ne': V(x=1, y=-1)}
+directions = {
+    'e': V(x=2, y=0),
+    'se': V(x=1, y=1),
+    'sw': V(x=-1, y=1),
+    'w': V(x=-2, y=0),
+    'nw': V(x=-1, y=-1),
+    'ne': V(x=1, y=-1),
+}
 
 
 def evolve(tiles):
@@ -29,11 +35,19 @@ def evolve(tiles):
             else:
                 white_tiles[neighbor] += 1
 
-    return ({
-        tile for tile, active_neighbors in black_tiles.items() if 1 <= active_neighbors <= 2
-    }).union({
-        tile for tile, active_neighbors in white_tiles.items() if active_neighbors == 2
-    })
+    return (
+        {
+            tile
+            for tile, active_neighbors in black_tiles.items()
+            if 1 <= active_neighbors <= 2
+        }
+    ).union(
+        {
+            tile
+            for tile, active_neighbors in white_tiles.items()
+            if active_neighbors == 2
+        }
+    )
 
 
 def main():
@@ -43,7 +57,7 @@ def main():
         tile = reduce(
             lambda carry, move: carry + directions[move],
             re.findall(r'[ns]?[ew]', line.strip()),
-            V(0, 0)
+            V(0, 0),
         )
 
         if tile in flipped:
@@ -59,5 +73,5 @@ def main():
     print(len(flipped))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

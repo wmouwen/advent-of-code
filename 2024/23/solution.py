@@ -7,7 +7,8 @@ def main():
     graph = nx.Graph()
 
     for line in sys.stdin:
-        if line.strip() == '': break
+        if line.strip() == '':
+            break
         graph.add_edge(*line.strip().split('-'))
 
     chief_candidate_count = 0
@@ -21,6 +22,7 @@ def main():
 
     print(chief_candidate_count)
     print(','.join(sorted(lan_party)))
+
 
 if __name__ == '__main__':
     main()

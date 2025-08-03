@@ -66,7 +66,7 @@ def main():
         grid.extend(V(x=r.x + v_rock.x, y=r.y + v_rock.y) for r in rock)
 
         # Detect height of grid
-        y_max = (max(v.y for v in grid) if len(grid) > 0 else -1)
+        y_max = max(v.y for v in grid) if len(grid) > 0 else -1
         if i_rock == 2021:
             print(y_max + 1)
 
@@ -74,8 +74,16 @@ def main():
         grid = list(filter(lambda g: g.y >= y_max - 50, grid))
 
         # Loop detection
-        if i_rock > 2021 and loop_length is not None and (1000000000000 - i_rock - 1) % loop_length == 0:
-            print(y_max + ((1000000000000 - i_rock - 1) // loop_length) * loop_increment + 1)
+        if (
+            i_rock > 2021
+            and loop_length is not None
+            and (1000000000000 - i_rock - 1) % loop_length == 0
+        ):
+            print(
+                y_max
+                + ((1000000000000 - i_rock - 1) // loop_length) * loop_increment
+                + 1
+            )
             break
 
         v_rock_trail = tuple(list(v_rock_trail[1:]) + [v_rock.x])

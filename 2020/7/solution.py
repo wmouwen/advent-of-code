@@ -24,7 +24,6 @@ tree_outwards = {}
 tree_inwards = {}
 
 for line in sys.stdin:
-
     outer_bag = re.search(r'^(.*?) bags contain', line).group(1)
     tree_inwards[outer_bag] = {}
 

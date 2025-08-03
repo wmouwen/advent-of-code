@@ -9,12 +9,7 @@ class Vector(NamedTuple):
     y: int
 
 
-movements = [
-    Vector(x=1, y=0),
-    Vector(x=0, y=1),
-    Vector(x=-1, y=0),
-    Vector(x=0, y=-1)
-]
+movements = [Vector(x=1, y=0), Vector(x=0, y=1), Vector(x=-1, y=0), Vector(x=0, y=-1)]
 
 grid: list[list[int]] = []
 summit: Vector | None = None
@@ -58,8 +53,10 @@ while not queue.empty():
 
 print(distances[start.y][start.x])
 
-trails = (distance
-          for y, row in enumerate(distances)
-          for x, distance in enumerate(row)
-          if distance is not None and grid[y][x] == 0)
+trails = (
+    distance
+    for y, row in enumerate(distances)
+    for x, distance in enumerate(row)
+    if distance is not None and grid[y][x] == 0
+)
 print(min(trails))

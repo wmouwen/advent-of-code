@@ -7,7 +7,9 @@ from itertools import permutations
 Snailfish = list[int | list] | int
 
 
-def explode_first(number: Snailfish, depth: int = 0) -> (Snailfish, tuple[int, int] | None):
+def explode_first(
+    number: Snailfish, depth: int = 0
+) -> (Snailfish, tuple[int, int] | None):
     if isinstance(number, int):
         return number, None
 
@@ -20,7 +22,8 @@ def explode_first(number: Snailfish, depth: int = 0) -> (Snailfish, tuple[int, i
             number[1] += carry[1]
         else:
             target = number[1]
-            while isinstance(target[0], list): target = target[0]
+            while isinstance(target[0], list):
+                target = target[0]
             target[0] += carry[1]
         return number, (carry[0], 0)
 
@@ -30,7 +33,8 @@ def explode_first(number: Snailfish, depth: int = 0) -> (Snailfish, tuple[int, i
             number[0] += carry[0]
         else:
             target = number[0]
-            while isinstance(target[1], list): target = target[1]
+            while isinstance(target[1], list):
+                target = target[1]
             target[1] += carry[0]
         return number, (0, carry[1])
 
@@ -77,20 +81,19 @@ def magnitude(number: Snailfish) -> int:
 
 
 def main():
-    snailfishes = [
-        json.loads(line.strip())
-        for line in sys.stdin.readlines()
-    ]
+    snailfishes = [json.loads(line.strip()) for line in sys.stdin.readlines()]
 
-    print(magnitude(reduce(
-        lambda carry, item: reduce_snailfish([carry, item]),
-        snailfishes
-    )))
+    print(
+        magnitude(
+            reduce(lambda carry, item: reduce_snailfish([carry, item]), snailfishes)
+        )
+    )
 
-    print(max(
-        magnitude(reduce_snailfish([a, b]))
-        for a, b in permutations(snailfishes, 2)
-    ))
+    print(
+        max(
+            magnitude(reduce_snailfish([a, b])) for a, b in permutations(snailfishes, 2)
+        )
+    )
 
 
 if __name__ == '__main__':

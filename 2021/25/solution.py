@@ -15,7 +15,10 @@ def step(seafloor):
     for y, row in enumerate(seafloor):
         for x, field in enumerate(row):
             if field == 'v':
-                if seafloor[(y + 1) % len(seafloor)][x] != 'v' and next_floor[(y + 1) % len(seafloor)][x] == '.':
+                if (
+                    seafloor[(y + 1) % len(seafloor)][x] != 'v'
+                    and next_floor[(y + 1) % len(seafloor)][x] == '.'
+                ):
                     next_floor[(y + 1) % len(seafloor)][x] = 'v'
                 else:
                     next_floor[y][x] = 'v'

@@ -44,5 +44,5 @@ def main():
     print(prod(first_n(cups, current=1, n=2)))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -23,7 +23,9 @@ symbols: list[Symbol] = []
 
 for line in sys.stdin:
     for match in re.finditer(r'\d+', line.strip()):
-        numbers.append(Number(line_number, match.start(), match.end() - 1, int(match[0])))
+        numbers.append(
+            Number(line_number, match.start(), match.end() - 1, int(match[0]))
+        )
 
     for match in re.finditer(r'[^\d.]', line.strip()):
         symbols.append(Symbol(line_number, match.start(), match[0]))
@@ -33,7 +35,10 @@ for line in sys.stdin:
 part1 = 0
 for number in numbers:
     for symbol in symbols:
-        if number.line - 1 <= symbol.line <= number.line + 1 and number.start - 1 <= symbol.location <= number.end + 1:
+        if (
+            number.line - 1 <= symbol.line <= number.line + 1
+            and number.start - 1 <= symbol.location <= number.end + 1
+        ):
             # print(number.value, number.start, number.end, symbol.symbol)
             part1 += number.value
             break
@@ -49,7 +54,10 @@ for symbol in symbols:
     gears_count = 0
     gears_ratio = 1
     for number in numbers:
-        if number.line - 1 <= symbol.line <= number.line + 1 and number.start - 1 <= symbol.location <= number.end + 1:
+        if (
+            number.line - 1 <= symbol.line <= number.line + 1
+            and number.start - 1 <= symbol.location <= number.end + 1
+        ):
             gears_count += 1
             gears_ratio *= number.value
 

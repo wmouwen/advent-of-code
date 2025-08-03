@@ -39,7 +39,11 @@ def play(monkeys: list[Monkey], rounds: int, reduce_worry: bool):
                 item = monkey.items.get()
 
                 # Inspect item
-                value = int(monkey.operation_value) if monkey.operation_value != 'old' else item
+                value = (
+                    int(monkey.operation_value)
+                    if monkey.operation_value != 'old'
+                    else item
+                )
                 if monkey.operation_operator == '*':
                     item *= value
                 elif monkey.operation_operator == '+':
@@ -84,5 +88,17 @@ for line in sys.stdin:
     if match := re.match(r'If false: throw to monkey (\d+)', line.strip()):
         monkeys[-1].target_false = int(match.group(1))
 
-print(play(monkeys=[copy_monkey(monkey) for monkey in monkeys], rounds=20, reduce_worry=True))
-print(play(monkeys=[copy_monkey(monkey) for monkey in monkeys], rounds=10000, reduce_worry=False))
+print(
+    play(
+        monkeys=[copy_monkey(monkey) for monkey in monkeys],
+        rounds=20,
+        reduce_worry=True,
+    )
+)
+print(
+    play(
+        monkeys=[copy_monkey(monkey) for monkey in monkeys],
+        rounds=10000,
+        reduce_worry=False,
+    )
+)

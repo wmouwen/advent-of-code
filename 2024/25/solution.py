@@ -2,11 +2,18 @@ import sys
 
 
 def parse_grid(grid):
-    return tuple(sum(int(grid[y][x] == '#') for y in range(len(grid))) for x in range(len(grid[0])))
+    return tuple(
+        sum(int(grid[y][x] == '#') for y in range(len(grid)))
+        for x in range(len(grid[0]))
+    )
 
 
 def matching_pairs(locks, keys, height):
-    return sum(int(all(lock[i] + key[i] <= height for i in range(len(lock)))) for lock in locks for key in keys)
+    return sum(
+        int(all(lock[i] + key[i] <= height for i in range(len(lock))))
+        for lock in locks
+        for key in keys
+    )
 
 
 def main():

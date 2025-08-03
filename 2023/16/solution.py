@@ -16,7 +16,7 @@ directions = {
     'R': Vector(x=1, y=0),
     'D': Vector(x=0, y=1),
     'L': Vector(x=-1, y=0),
-    'U': Vector(x=0, y=-1)
+    'U': Vector(x=0, y=-1),
 }
 
 
@@ -28,7 +28,9 @@ def energized_tiles(contraption: tuple, start: Beam) -> int:
         beam = todo.pop()
 
         # Check out of bounds
-        if not 0 <= beam.location.y < len(beams) or not 0 <= beam.location.x < len(beams[beam.location.y]):
+        if not 0 <= beam.location.y < len(beams) or not 0 <= beam.location.x < len(
+            beams[beam.location.y]
+        ):
             continue
 
         # Check revisit
@@ -44,20 +46,32 @@ def energized_tiles(contraption: tuple, start: Beam) -> int:
         if contraption[beam.location.y][beam.location.x] == '.':
             new_directions.append(beam.direction)
         elif contraption[beam.location.y][beam.location.x] == '/':
-            new_directions.append({'R': 'U', 'D': 'L', 'L': 'D', 'U': 'R'}[beam.direction])
+            new_directions.append(
+                {'R': 'U', 'D': 'L', 'L': 'D', 'U': 'R'}[beam.direction]
+            )
         elif contraption[beam.location.y][beam.location.x] == '\\':
-            new_directions.append({'R': 'D', 'D': 'R', 'L': 'U', 'U': 'L'}[beam.direction])
+            new_directions.append(
+                {'R': 'D', 'D': 'R', 'L': 'U', 'U': 'L'}[beam.direction]
+            )
         elif contraption[beam.location.y][beam.location.x] == '|':
-            new_directions.extend(['D', 'U'] if beam.direction in ['R', 'L'] else beam.direction)
+            new_directions.extend(
+                ['D', 'U'] if beam.direction in ['R', 'L'] else beam.direction
+            )
         elif contraption[beam.location.y][beam.location.x] == '-':
-            new_directions.extend(['R', 'L'] if beam.direction in ['D', 'U'] else beam.direction)
+            new_directions.extend(
+                ['R', 'L'] if beam.direction in ['D', 'U'] else beam.direction
+            )
 
         for direction in new_directions:
-            todo.append(Beam(
-                location=Vector(x=beam.location.x + directions[direction].x,
-                                y=beam.location.y + directions[direction].y),
-                direction=direction
-            ))
+            todo.append(
+                Beam(
+                    location=Vector(
+                        x=beam.location.x + directions[direction].x,
+                        y=beam.location.y + directions[direction].y,
+                    ),
+                    direction=direction,
+                )
+            )
 
     return sum(1 for row in beams for tile in row if tile)
 
@@ -71,14 +85,20 @@ for y in range(len(contraption)):
     best = max(
         best,
         energized_tiles(contraption, Beam(location=Vector(x=0, y=y), direction='R')),
-        energized_tiles(contraption, Beam(location=Vector(x=len(contraption) - 1, y=y), direction='L'))
+        energized_tiles(
+            contraption,
+            Beam(location=Vector(x=len(contraption) - 1, y=y), direction='L'),
+        ),
     )
 
 for x in range(len(contraption[0])):
     best = max(
         best,
         energized_tiles(contraption, Beam(location=Vector(x=x, y=0), direction='D')),
-        energized_tiles(contraption, Beam(location=Vector(x=x, y=len(contraption) - 1), direction='U'))
+        energized_tiles(
+            contraption,
+            Beam(location=Vector(x=x, y=len(contraption) - 1), direction='U'),
+        ),
     )
 
 print(best)

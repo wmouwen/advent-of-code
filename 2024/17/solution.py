@@ -11,19 +11,27 @@ def run(registers, instructions):
     output = []
 
     while 0 <= ip < len(instructions):
-        opcode, literal_operand = instructions[ip:ip + 2]
+        opcode, literal_operand = instructions[ip : ip + 2]
         combo_operand = combo(literal_operand, registers)
 
         ip += 2
 
-        if opcode == 0: registers[0] >>= combo_operand
-        if opcode == 1: registers[1] ^= literal_operand
-        if opcode == 2: registers[1] = combo_operand & 7
-        if opcode == 3 and registers[0] > 0: ip = literal_operand
-        if opcode == 4: registers[1] ^= registers[2]
-        if opcode == 5: output.append(combo_operand & 7)
-        if opcode == 6: registers[1] = registers[0] >> combo_operand
-        if opcode == 7: registers[2] = registers[0] >> combo_operand
+        if opcode == 0:
+            registers[0] >>= combo_operand
+        if opcode == 1:
+            registers[1] ^= literal_operand
+        if opcode == 2:
+            registers[1] = combo_operand & 7
+        if opcode == 3 and registers[0] > 0:
+            ip = literal_operand
+        if opcode == 4:
+            registers[1] ^= registers[2]
+        if opcode == 5:
+            output.append(combo_operand & 7)
+        if opcode == 6:
+            registers[1] = registers[0] >> combo_operand
+        if opcode == 7:
+            registers[2] = registers[0] >> combo_operand
 
     return output
 

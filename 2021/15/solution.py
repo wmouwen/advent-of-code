@@ -14,7 +14,7 @@ def calc_lowest_costs(cost_map: list, start: tuple) -> list:
     while queue:
         (x, y) = queue.pop()
 
-        for (dx, dy) in directions:
+        for dx, dy in directions:
             (nx, ny) = (x + dx, y + dy)
 
             if not (0 <= ny < len(lowest_cost_map)):
@@ -40,7 +40,9 @@ def tile(input: list, vx: int, vy: int) -> list:
 
     for y in range(len(output)):
         for x in range(len(output[y])):
-            output[y][x] = ((input[y % y_max][x % x_max] + (y // y_max) + (x // x_max) - 1) % 9) + 1
+            output[y][x] = (
+                (input[y % y_max][x % x_max] + (y // y_max) + (x // x_max) - 1) % 9
+            ) + 1
 
     return output
 

@@ -11,7 +11,9 @@ def play_deterministic(starting_positions: list[int]):
     while all(score < 1000 for score in scores):
         current_player = turn % len(positions)
 
-        dice_throws = (((num_dices * turn + dice) % 100) + 1 for dice in range(num_dices))
+        dice_throws = (
+            ((num_dices * turn + dice) % 100) + 1 for dice in range(num_dices)
+        )
         positions[current_player] = (positions[current_player] + sum(dice_throws)) % 10
         scores[current_player] += positions[current_player] + 1
 
@@ -20,7 +22,9 @@ def play_deterministic(starting_positions: list[int]):
     return min(scores) * (turn * num_dices)
 
 
-def count_universes(positions: list[int], target: int, scores: list[int] = None) -> list[int]:
+def count_universes(
+    positions: list[int], target: int, scores: list[int] = None
+) -> list[int]:
     if scores is None:
         positions = [position - 1 for position in positions]
         scores = [0 for _ in positions]
@@ -32,21 +36,12 @@ def count_universes(positions: list[int], target: int, scores: list[int] = None)
 
     for roll, frequency in {3: 1, 4: 3, 5: 6, 6: 7, 7: 6, 8: 3, 9: 1}.items():
         universes = count_universes(
-            positions=[
-                positions[1],
-                (positions[0] + roll) % 10
-            ],
+            positions=[positions[1], (positions[0] + roll) % 10],
             target=target,
-            scores=[
-                scores[1],
-                scores[0] + ((positions[0] + roll) % 10 + 1)
-            ]
+            scores=[scores[1], scores[0] + ((positions[0] + roll) % 10 + 1)],
         )
 
-        wins = [
-            wins[0] + frequency * universes[1],
-            wins[1] + frequency * universes[0]
-        ]
+        wins = [wins[0] + frequency * universes[1], wins[1] + frequency * universes[0]]
 
     return wins
 

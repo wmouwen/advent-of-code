@@ -11,7 +11,7 @@ for line in sys.stdin:
     stack = []
 
     for current in line.strip():
-        if current in "<{[(":
+        if current in '<{[(':
             stack.append(current)
             continue
 

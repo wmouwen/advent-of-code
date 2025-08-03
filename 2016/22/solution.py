@@ -16,19 +16,30 @@ def main():
     nodes = {}
 
     for line in sys.stdin:
-        if match := re.match(r'/dev/grid/node-x(\d+)-y(\d+)\s+(\d+)T\s+(\d+)T\s+(\d+)T\s+\d+%', line.strip()):
+        if match := re.match(
+            r'/dev/grid/node-x(\d+)-y(\d+)\s+(\d+)T\s+(\d+)T\s+(\d+)T\s+\d+%',
+            line.strip(),
+        ):
             node = Node(*map(int, match.groups()))
             if node.y not in nodes:
                 nodes[node.y] = {}
             nodes[node.y][node.x] = node
 
-    all_nodes = set(itertools.chain.from_iterable(map(lambda row: row.values(), nodes.values())))
-    print(sum(a != b and 0 < a.used <= b.available for a in all_nodes for b in all_nodes))
+    all_nodes = set(
+        itertools.chain.from_iterable(map(lambda row: row.values(), nodes.values()))
+    )
+    print(
+        sum(a != b and 0 < a.used <= b.available for a in all_nodes for b in all_nodes)
+    )
 
     # No node can contain data of two disks combined
-    assert all(a.used + b.used > a.size and a.used + b.used > b.size
-               for a in all_nodes if a.used > 0
-               for b in all_nodes if b.used > 0 and a != b)
+    assert all(
+        a.used + b.used > a.size and a.used + b.used > b.size
+        for a in all_nodes
+        if a.used > 0
+        for b in all_nodes
+        if b.used > 0 and a != b
+    )
 
     # There is exactly one empty slot
     assert sum(node.used == 0 for node in all_nodes) == 1

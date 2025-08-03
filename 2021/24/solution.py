@@ -10,12 +10,18 @@ def run_raw_alu(instructions: list[list[str]], candidate: str):
     variables = {'w': 0, 'x': 0, 'y': 0, 'z': 0}
 
     for op, *args in instructions:
-        if op == 'inp': variables[args[0]] = candidate.pop(0)
-        if op == 'add': variables[args[0]] += val(args[1], variables)
-        if op == 'mul': variables[args[0]] *= val(args[1], variables)
-        if op == 'div': variables[args[0]] = variables[args[0]] // val(args[1], variables)
-        if op == 'mod': variables[args[0]] %= val(args[1], variables)
-        if op == 'eql': variables[args[0]] = int(variables[args[0]] == val(args[1], variables))
+        if op == 'inp':
+            variables[args[0]] = candidate.pop(0)
+        if op == 'add':
+            variables[args[0]] += val(args[1], variables)
+        if op == 'mul':
+            variables[args[0]] *= val(args[1], variables)
+        if op == 'div':
+            variables[args[0]] = variables[args[0]] // val(args[1], variables)
+        if op == 'mod':
+            variables[args[0]] %= val(args[1], variables)
+        if op == 'eql':
+            variables[args[0]] = int(variables[args[0]] == val(args[1], variables))
 
     return variables['z']
 
@@ -37,7 +43,12 @@ def next_z(digit, a, b, c, z):
     return (z // a) * 26 + digit + c
 
 
-def solve(instructions: list[tuple[int, int, int]], direction=-1, candidate: list[int] = None, z: int = 0) -> str | None:
+def solve(
+    instructions: list[tuple[int, int, int]],
+    direction=-1,
+    candidate: list[int] = None,
+    z: int = 0,
+) -> str | None:
     if candidate is None:
         candidate = []
 
@@ -48,13 +59,19 @@ def solve(instructions: list[tuple[int, int, int]], direction=-1, candidate: lis
     if a == 26:
         digit = (z % 26) + b
         if 1 <= digit <= 9:
-            answer = solve(instructions, direction, candidate + [digit], next_z(digit, a, b, c, z))
-            if answer is not None: return answer
+            answer = solve(
+                instructions, direction, candidate + [digit], next_z(digit, a, b, c, z)
+            )
+            if answer is not None:
+                return answer
 
     else:
-        for digit in (range(9, 0, -1) if direction == -1 else range(1, 10)):
-            answer = solve(instructions, direction, candidate + [digit], next_z(digit, a, b, c, z))
-            if answer is not None: return answer
+        for digit in range(9, 0, -1) if direction == -1 else range(1, 10):
+            answer = solve(
+                instructions, direction, candidate + [digit], next_z(digit, a, b, c, z)
+            )
+            if answer is not None:
+                return answer
 
     return None
 
@@ -75,7 +92,11 @@ def main():
     assert len(instructions) == 18 * 14
 
     short_instructions = [
-        (int(instructions[offset + 4][2]), int(instructions[offset + 5][2]), int(instructions[offset + 15][2]))
+        (
+            int(instructions[offset + 4][2]),
+            int(instructions[offset + 5][2]),
+            int(instructions[offset + 15][2]),
+        )
         for offset in range(0, len(instructions), 18)
     ]
 

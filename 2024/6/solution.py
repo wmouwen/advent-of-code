@@ -19,14 +19,20 @@ def steps_to_exit(grid: list[list[str]]) -> set[Vector]:
     patrol_route = {(curr_pos, curr_dir)}
 
     while True:
-        next_pos = Vector(y=curr_pos.y + dirs[curr_dir].y, x=curr_pos.x + dirs[curr_dir].x)
+        next_pos = Vector(
+            y=curr_pos.y + dirs[curr_dir].y, x=curr_pos.x + dirs[curr_dir].x
+        )
         while 0 <= next_pos.y < len(grid) and 0 <= next_pos.x < len(grid[next_pos.y]):
             if grid[next_pos.y][next_pos.x] != '#':
                 break
             curr_dir = (curr_dir + 1) % len(dirs)
-            next_pos = Vector(y=curr_pos.y + dirs[curr_dir].y, x=curr_pos.x + dirs[curr_dir].x)
+            next_pos = Vector(
+                y=curr_pos.y + dirs[curr_dir].y, x=curr_pos.x + dirs[curr_dir].x
+            )
 
-        if not (0 <= next_pos.y < len(grid) and 0 <= next_pos.x < len(grid[next_pos.y])):
+        if not (
+            0 <= next_pos.y < len(grid) and 0 <= next_pos.x < len(grid[next_pos.y])
+        ):
             break
 
         curr_pos = next_pos

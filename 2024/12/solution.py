@@ -22,7 +22,11 @@ class Region:
 
         for x, y in self.cells:
             for dx, dy in [(-1, -1), (1, -1), (1, 1), (-1, 1)]:
-                cx, cy, cxy = (x + dx, y) in self.cells, (x, y + dy) in self.cells, (x + dx, y + dy) in self.cells
+                cx, cy, cxy = (
+                    (x + dx, y) in self.cells,
+                    (x, y + dy) in self.cells,
+                    (x + dx, y + dy) in self.cells,
+                )
                 corners += int((not cx and not cy) or (cx and cy and not cxy))
 
         return corners
@@ -53,7 +57,7 @@ def build_region(grid, x, y):
 
 
 def main():
-    grid = [list(line.strip()) for line in sys.stdin if line.strip() != ""]
+    grid = [list(line.strip()) for line in sys.stdin if line.strip() != '']
 
     regions = []
     for y in range(len(grid)):
