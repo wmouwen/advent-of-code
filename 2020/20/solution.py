@@ -239,7 +239,6 @@ def main():
     assert sum(len(row) for row in layout) == len(tiles)
 
     image = build_image(layout)
-    print(*[''.join(row) for row in image], sep='\n')
     assert len(image) * len(image[0]) == (
         (len(tiles[0].edge(Direction.North, 0, False)) - 2) ** 2
     ) * (len(layout) * len(layout[0]))
