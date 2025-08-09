@@ -22,20 +22,17 @@ DIRECTIONS = (
 class QueueItem(NamedTuple):
     priority_key_count: int
     priority_distance: int
-    position: Vector
+    positions: frozenset[Vector]
     keys: frozenset[str]
     distance: int
 
 
-def locate(char: str, maze: Maze) -> Vector | None:
-    return next(
-        (
-            Vector(x=x, y=y)
-            for y, row in enumerate(maze)
-            for x, cell in enumerate(row)
-            if cell == char
-        ),
-        None,
+def locate(char: str, maze: Maze) -> frozenset[Vector]:
+    return frozenset(
+        Vector(x=x, y=y)
+        for y, row in enumerate(maze)
+        for x, cell in enumerate(row)
+        if cell == char
     )
 
 
@@ -97,15 +94,13 @@ def reachable(maze: Maze, keys: frozenset[str], start: Vector) -> dict[str, int]
     return reachable_keys
 
 
-def main():
-    maze = tuple(tuple(line.strip()) for line in sys.stdin)
-    entrance = locate('@', maze)
-    assert entrance is not None
+def find_shortest_path(maze: Maze) -> int:
+    entrances = locate('@', maze)
 
     key_locations: dict[str, Vector] = {
-        key: location
+        key: next(iter(locations))
         for key in ascii_lowercase
-        if (location := locate(key, maze)) is not None
+        if len(locations := locate(key, maze)) > 0
     }
     key_count = len(key_locations)
     assert key_count > 0
@@ -115,10 +110,12 @@ def main():
             min(d[0] for d in min_dists(maze, key_locations[key]).values())
             for key in key_locations
         ),
-        min(d[0] for d in min_dists(maze, entrance).values()),
+        min(
+            min(d[0] for d in min_dists(maze, entrance).values())
+            for entrance in entrances
+        ),
     )
 
-    intermediate_best = {key: dict() for key in key_locations}
     best = len(maze) * len(maze[0]) * key_count
 
     queue = PriorityQueue()
@@ -126,21 +123,25 @@ def main():
         QueueItem(
             priority_key_count=0,
             priority_distance=0,
-            position=entrance,
+            positions=entrances,
             distance=0,
             keys=frozenset(),
         )
     )
 
     while not queue.empty():
-        item = queue.get()
+        item: QueueItem = queue.get()
         if item.distance + min_dist * (key_count - (len(item.keys) + 1)) >= best:
             break
 
-        targets = reachable(
-            maze=maze, keys=frozenset(sorted(item.keys)), start=item.position
-        ).items()
-        for key, distance in targets:
+        targets = []
+        for start in item.positions:
+            for key, distance in reachable(
+                maze=maze, keys=frozenset(sorted(item.keys)), start=start
+            ).items():
+                targets.append((start, key, distance))
+
+        for start, key, distance in targets:
             if key in item.keys:
                 continue
 
@@ -149,17 +150,10 @@ def main():
                 continue
 
             new_keys = frozenset(sorted(item.keys | {key}))
-            if (
-                new_keys in intermediate_best[key]
-                and new_distance >= intermediate_best[key][new_keys]
-            ):
-                continue
-
             new_key_count = len(new_keys)
             if (new_distance + min_dist * (key_count - new_key_count)) >= best:
                 continue
 
-            intermediate_best[key][new_keys] = new_distance
             if new_key_count == key_count:
                 best = new_distance
                 continue
@@ -168,13 +162,35 @@ def main():
                 QueueItem(
                     priority_key_count=-new_key_count,
                     priority_distance=-new_distance,
-                    position=key_locations[key],
+                    positions=item.positions.difference({start}).union(
+                        {key_locations[key]}
+                    ),
                     distance=new_distance,
                     keys=new_keys,
                 )
             )
 
-    print(best)
+    return best
+
+
+def main():
+    maze = tuple(tuple(line.strip()) for line in sys.stdin)
+    print(find_shortest_path(maze))
+
+    entrance = next(iter(locate('@', maze)))
+    maze = list(list(row) for row in maze)
+    maze[entrance.y - 1][entrance.x - 1] = '@'
+    maze[entrance.y - 1][entrance.x] = '#'
+    maze[entrance.y - 1][entrance.x + 1] = '@'
+    maze[entrance.y][entrance.x - 1] = '#'
+    maze[entrance.y][entrance.x] = '#'
+    maze[entrance.y][entrance.x + 1] = '#'
+    maze[entrance.y + 1][entrance.x - 1] = '@'
+    maze[entrance.y + 1][entrance.x] = '#'
+    maze[entrance.y + 1][entrance.x + 1] = '@'
+    maze = tuple(tuple(row) for row in maze)
+
+    print(find_shortest_path(maze))
 
 
 if __name__ == '__main__':
