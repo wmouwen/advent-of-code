@@ -110,9 +110,12 @@ class IntcodeComputer:
                     self.ip += 0x04
 
                 case Opcode.IN:
+                    input_value = self.input_callback()
+                    if input_value is None:
+                        return
                     self.write(
                         addr=self.read(self.ip + 0x01, modes[0], target_write=True),
-                        value=self.input_callback(),
+                        value=input_value,
                     )
                     self.ip += 0x02
 
