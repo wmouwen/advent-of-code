@@ -100,20 +100,9 @@ def main():
         path = path.replace(movements, function)
     # print(path)
 
-    instructions = [
-        *map(ord, path),
-        ord('\n'),
-        *map(ord, functions['A']),
-        ord('\n'),
-        *map(ord, functions['B']),
-        ord('\n'),
-        *map(ord, functions['C']),
-        ord('\n'),
-        ord('n'),
-        ord('\n'),
-    ]
-    # print(instructions)
+    instructions = [path, functions['A'], functions['B'], functions['C'], 'n']
 
+    instructions = list(map(ord, '\n'.join(instructions) + '\n'))
     output = []
     computer = IntcodeComputer(
         program=program,
