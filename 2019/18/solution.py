@@ -1,16 +1,23 @@
 import sys
-from functools import cache
+from collections import defaultdict
+from dataclasses import dataclass
 from queue import Queue, PriorityQueue
 from string import ascii_lowercase, ascii_uppercase
-from typing import NamedTuple
 
 
-class Vector(NamedTuple):
+@dataclass(frozen=True)
+class Vector:
     x: int
     y: int
 
+    def __lt__(self, other):
+        return self.x < other.x if self.y == other.y else self.y < other.y
 
-Maze = tuple[tuple[str, ...], ...]
+
+Maze = list[list[str]]
+ObjectDict = dict[str, Vector]
+DistanceMatrix = dict[Vector, dict[Vector, int]]
+
 DIRECTIONS = (
     Vector(x=0, y=-1),
     Vector(x=1, y=0),
@@ -19,162 +26,151 @@ DIRECTIONS = (
 )
 
 
-class QueueItem(NamedTuple):
-    priority_key_count: int
-    priority_distance: int
-    position: Vector
-    keys: frozenset[str]
-    distance: int
-
-
-def locate(char: str, maze: Maze) -> Vector | None:
-    return next(
-        (
-            Vector(x=x, y=y)
-            for y, row in enumerate(maze)
-            for x, cell in enumerate(row)
-            if cell == char
-        ),
-        None,
-    )
-
-
-def min_dists(maze: Maze, start: Vector) -> dict[str, tuple[int, frozenset]]:
-    reachable_keys = dict()
-    visited = {start}
-    queue = Queue()
-    queue.put((start, 0, frozenset()))
-
-    while not queue.empty():
-        current, distance, doors = queue.get()
-        for d in DIRECTIONS:
-            candidate = Vector(x=current.x + d.x, y=current.y + d.y)
-            if candidate in visited:
-                continue
-
-            char = maze[candidate.y][candidate.x]
-            if char == '#':
-                continue
-
-            if char in ascii_uppercase:
-                doors = frozenset(doors | {char.lower()})
-
-            if char in ascii_lowercase:
-                reachable_keys[char] = (distance + 1, doors)
-
-            visited.add(candidate)
-            queue.put((candidate, distance + 1, doors))
-
-    return reachable_keys
-
-
-@cache
-def reachable(maze: Maze, keys: frozenset[str], start: Vector) -> dict[str, int]:
-    reachable_keys = dict()
+def floodfill(maze: Maze, start: Vector) -> dict[Vector, int]:
     distances = {start: 0}
-    queue = Queue()
+
+    queue: Queue[Vector] = Queue()
     queue.put(start)
 
     while not queue.empty():
         current = queue.get()
-        distance = distances[current] + 1
 
         for d in DIRECTIONS:
-            candidate = Vector(x=current.x + d.x, y=current.y + d.y)
-            if candidate in distances:
+            neighbor = Vector(current.x + d.x, current.y + d.y)
+
+            if maze[neighbor.y][neighbor.x] == '#' or neighbor in distances:
                 continue
 
-            char = maze[candidate.y][candidate.x]
-            if char == '#' or (char in ascii_uppercase and char.lower() not in keys):
+            distances[neighbor] = distances[current] + 1
+
+            if maze[neighbor.y][neighbor.x] == '.':
+                queue.put(neighbor)
+
+    return distances
+
+
+def distance_matrix(
+    maze: Maze, robots: list[Vector], keys: ObjectDict, doors: ObjectDict
+) -> DistanceMatrix:
+    targets = list(keys.values()) + list(doors.values())
+    sources = robots + targets
+    distances = defaultdict(dict)
+
+    for source in sources:
+        distances_from_object = floodfill(maze, source)
+
+        for target in targets:
+            if source == target:
                 continue
 
-            if char in ascii_lowercase:
-                reachable_keys[char] = distance
+            if target not in distances_from_object:
+                continue
 
-            distances[candidate] = distance
-            queue.put(candidate)
+            distances[source][target] = distances_from_object[target]
 
-    return reachable_keys
+    return dict(distances)
+
+
+def shortest_multipath(
+    maze: Maze, robots: list[Vector], keys: ObjectDict, doors: ObjectDict
+) -> int | None:
+    distances = distance_matrix(maze, robots, keys, doors)
+
+    queue: PriorityQueue[tuple[int, int, set[str], set[Vector]]] = PriorityQueue()
+    queue.put((0, 0, set(), set(robots)))
+
+    best = None
+    min_weight = min(min(distances[source].values()) for source in keys.values())
+    visited = dict()
+
+    while not queue.empty():
+        _, distance, collected_keys, robots = queue.get()
+
+        # Prune unrealistic remainder weights
+        if (
+            best is not None
+            and distance + min_weight * (len(keys) - len(collected_keys)) > best
+        ):
+            continue
+
+        # Prune visited states
+        visited_key = (''.join(sorted(collected_keys)), tuple(sorted(robots)))
+        if visited_key in visited and visited[visited_key] <= distance:
+            continue
+
+        visited[visited_key] = distance
+
+        # Break loop if all keys have been collected
+        if len(collected_keys) == len(keys):
+            best = distance
+            continue
+
+        # Attempt to move each robot to all its reachable locations
+        for robot in robots:
+            for key in keys:
+                if keys[key] not in distances[robot]:
+                    continue
+
+                new_keys = collected_keys | {key}
+                queue.put(
+                    (
+                        -len(new_keys),
+                        distance + distances[robot][keys[key]],
+                        new_keys,
+                        (robots - {robot}) | {keys[key]},
+                    )
+                )
+
+            for door in doors:
+                if doors[door] not in distances[robot]:
+                    continue
+
+                if door.lower() not in collected_keys:
+                    continue
+
+                queue.put(
+                    (
+                        -len(collected_keys),
+                        distance + distances[robot][doors[door]],
+                        collected_keys,
+                        (robots - {robot}) | {doors[door]},
+                    )
+                )
+
+    return best
 
 
 def main():
-    maze = tuple(tuple(line.strip()) for line in sys.stdin)
-    entrance = locate('@', maze)
-    assert entrance is not None
+    maze = list(list(line.strip()) for line in sys.stdin)
 
-    key_locations: dict[str, Vector] = {
-        key: location
-        for key in ascii_lowercase
-        if (location := locate(key, maze)) is not None
-    }
-    key_count = len(key_locations)
-    assert key_count > 0
+    robots, keys, doors = [], dict(), dict()
+    for y, row in enumerate(maze):
+        for x, cell in enumerate(row):
+            if cell == '@':
+                robots.append(Vector(x=x, y=y))
+                maze[y][x] = '.'
+            elif cell in ascii_lowercase:
+                keys.update({cell: Vector(x=x, y=y)})
+            elif cell in ascii_uppercase:
+                doors.update({cell: Vector(x=x, y=y)})
 
-    min_dist = min(
-        min(
-            min(d[0] for d in min_dists(maze, key_locations[key]).values())
-            for key in key_locations
-        ),
-        min(d[0] for d in min_dists(maze, entrance).values()),
-    )
+    print(shortest_multipath(maze, robots, keys, doors))
 
-    intermediate_best = {key: dict() for key in key_locations}
-    best = len(maze) * len(maze[0]) * key_count
+    robot = robots[0]
+    for dy in range(-1, 2):
+        for dx in range(-1, 2):
+            maze[robot.y + dy][robot.x + dx] = '#'
 
-    queue = PriorityQueue()
-    queue.put(
-        QueueItem(
-            priority_key_count=0,
-            priority_distance=0,
-            position=entrance,
-            distance=0,
-            keys=frozenset(),
-        )
-    )
+    robots = [
+        Vector(x=robot.x - 1, y=robot.y - 1),
+        Vector(x=robot.x - 1, y=robot.y + 1),
+        Vector(x=robot.x + 1, y=robot.y - 1),
+        Vector(x=robot.x + 1, y=robot.y + 1),
+    ]
+    for robot in robots:
+        maze[robot.y][robot.x] = '.'
 
-    while not queue.empty():
-        item = queue.get()
-        if item.distance + min_dist * (key_count - (len(item.keys) + 1)) >= best:
-            break
-
-        targets = reachable(
-            maze=maze, keys=frozenset(sorted(item.keys)), start=item.position
-        ).items()
-        for key, distance in targets:
-            if key in item.keys:
-                continue
-
-            new_distance = item.distance + distance
-            if new_distance >= best:
-                continue
-
-            new_keys = frozenset(sorted(item.keys | {key}))
-            if (
-                new_keys in intermediate_best[key]
-                and new_distance >= intermediate_best[key][new_keys]
-            ):
-                continue
-
-            new_key_count = len(new_keys)
-            if (new_distance + min_dist * (key_count - new_key_count)) >= best:
-                continue
-
-            intermediate_best[key][new_keys] = new_distance
-            if new_key_count == key_count:
-                best = new_distance
-                continue
-
-            queue.put(
-                QueueItem(
-                    priority_key_count=-new_key_count,
-                    priority_distance=-new_distance,
-                    position=key_locations[key],
-                    distance=new_distance,
-                    keys=new_keys,
-                )
-            )
-
-    print(best)
+    print(shortest_multipath(maze, robots, keys, doors))
 
 
 if __name__ == '__main__':

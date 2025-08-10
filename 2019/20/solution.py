@@ -67,7 +67,7 @@ def is_outer(maze: Maze, position: Vector) -> bool:
     )
 
 
-def floodfill_maze(passages: list[Vector], start: Vector) -> dict[Vector, int]:
+def floodfill(passages: list[Vector], start: Vector) -> dict[Vector, int]:
     distances = {start: 0}
 
     queue: Queue[Vector] = Queue()
@@ -103,7 +103,7 @@ def parse_maze(maze: Maze):
                 portals.append(portal)
 
     for portal in portals:
-        distances = floodfill_maze(passages, portal.position)
+        distances = floodfill(passages, portal.position)
         for other in portals:
             if portal is other:
                 continue
