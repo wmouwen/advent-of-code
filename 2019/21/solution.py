@@ -33,11 +33,9 @@ def main():
             'NOT C T',
             'OR T J',
             'AND D J',
-
             # Always jump if A is a hole
             'NOT A T',
             'OR T J',
-
             # Walking mode
             'WALK',
         ],
@@ -53,14 +51,11 @@ def main():
             'NOT C T',
             'OR T J',
             'AND D J',
-
             # Make sure a double jump is possible if needed
             'AND H J',
-
             # Always jump if A is a hole
             'NOT A T',
             'OR T J',
-
             # Running mode
             'RUN',
         ],
