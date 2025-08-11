@@ -1,16 +1,10 @@
 import re
 import sys
 from dataclasses import dataclass
-from typing import NamedTuple, Iterable
+from typing import Iterable
 
 
-class Vector(NamedTuple):
-    x: int
-    y: int
-    z: int
-
-
-@dataclass
+@dataclass(frozen=True)
 class Cuboid:
     on: bool
     x: range
@@ -18,81 +12,55 @@ class Cuboid:
     z: range
 
     def intersect(self, other: 'Cuboid', on: bool) -> 'Cuboid | None':
-        intersection = Cuboid(
-            on=on,
-            x=range(max(self.x.start, other.x.start), min(self.x.stop, other.x.stop)),
-            y=range(max(self.y.start, other.y.start), min(self.y.stop, other.y.stop)),
-            z=range(max(self.z.start, other.z.start), min(self.z.stop, other.z.stop)),
+        x = range(max(self.x.start, other.x.start), min(self.x.stop, other.x.stop))
+        y = range(max(self.y.start, other.y.start), min(self.y.stop, other.y.stop))
+        z = range(max(self.z.start, other.z.start), min(self.z.stop, other.z.stop))
+
+        if x.start <= x.stop and y.start <= y.stop and z.start <= z.stop:
+            return Cuboid(on=on, x=x, y=y, z=z)
+
+        return None
+
+    def volume(self) -> int:
+        return (
+            (self.x.stop - self.x.start + 1)
+            * (self.y.stop - self.y.start + 1)
+            * (self.z.stop - self.z.start + 1)
         )
 
-        if (
-            intersection.x.start > intersection.x.stop
-            or intersection.y.start > intersection.y.stop
-            or intersection.z.start > intersection.z.stop
-        ):
-            return None
 
-        return intersection
-
-
-def read_input() -> list[Cuboid]:
+def read_input() -> Iterable[Cuboid]:
     cuboids = []
     regex = r'(on|off) x=(-?\d+)..(-?\d+),y=(-?\d+)..(-?\d+),z=(-?\d+)..(-?\d+)'
 
     for line in sys.stdin:
         if match := re.match(regex, line):
-            cuboids.append(
-                Cuboid(
-                    match.group(1) == 'on',
-                    range(int(match.group(2)), int(match.group(3))),
-                    range(int(match.group(4)), int(match.group(5))),
-                    range(int(match.group(6)), int(match.group(7))),
-                )
-            )
+            x = range(int(match.group(2)), int(match.group(3)))
+            y = range(int(match.group(4)), int(match.group(5)))
+            z = range(int(match.group(6)), int(match.group(7)))
+            cuboids.append(Cuboid(on=match.group(1) == 'on', x=x, y=y, z=z))
 
     return cuboids
 
 
 def reboot(steps: Iterable[Cuboid]) -> int:
-    cuboids: list[Cuboid] = []
+    cuboids = []
 
     for step in steps:
-        new_cuboids = []
-
+        cuboids.extend(filter(None, [step.intersect(c, not c.on) for c in cuboids]))
         if step.on:
-            new_cuboids.append(step)
+            cuboids.append(step)
 
-        for cuboid in cuboids:
-            intersection = step.intersect(cuboid, not cuboid.on)
-            if intersection is not None:
-                new_cuboids.append(intersection)
-
-        cuboids.extend(new_cuboids)
-
-    return sum(
-        (1 if cuboid.on else -1)
-        * (cuboid.x.stop - cuboid.x.start + 1)
-        * (cuboid.y.stop - cuboid.y.start + 1)
-        * (cuboid.z.stop - cuboid.z.start + 1)
-        for cuboid in cuboids
-    )
+    return sum((1 if c.on else -1) * c.volume() for c in cuboids)
 
 
 def main():
     cuboids = read_input()
 
-    init_area = Cuboid(
-        on=False,
-        x=range(-50, 50),
-        y=range(-50, 50),
-        z=range(-50, 50),
-    )
-    init_area_cuboids = filter(
-        lambda cuboid: cuboid is not None,
-        [init_area.intersect(cuboid, cuboid.on) for cuboid in cuboids],
-    )
+    init_area = Cuboid(on=False, x=range(-50, 50), y=range(-50, 50), z=range(-50, 50))
+    init_cuboids = filter(None, [init_area.intersect(c, c.on) for c in cuboids])
+    print(reboot(init_cuboids))
 
-    print(reboot(init_area_cuboids))
     print(reboot(cuboids))
 
 
