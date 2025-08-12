@@ -40,13 +40,13 @@ class Vector:
 
         return all_orientations
 
+    @cached_property
+    def length(self) -> int:
+        return abs(self.x) + abs(self.y) + abs(self.z)
+
     @cache
     def oriented(self, orientation: int):
         return self._orientations[orientation]
-
-    @cache
-    def distance(self, other: 'Vector') -> int:
-        return abs(self.x - other.x) + abs(self.y - other.y) + abs(self.z - other.z)
 
     @cache
     def __add__(self, other: 'Vector') -> 'Vector':
@@ -221,7 +221,7 @@ def main():
     scanner_positions = {
         placement.position for placement in scanner_placements.values()
     }
-    print(max(a.distance(b) for a, b in combinations(scanner_positions, 2)))
+    print(max((a - b).length for a, b in combinations(scanner_positions, 2)))
 
 
 if __name__ == '__main__':
