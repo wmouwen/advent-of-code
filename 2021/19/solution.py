@@ -45,6 +45,10 @@ class Vector:
         return self._orientations[orientation]
 
     @cache
+    def distance(self, other: 'Vector') -> int:
+        return abs(self.x - other.x) + abs(self.y - other.y) + abs(self.z - other.z)
+
+    @cache
     def __add__(self, other: 'Vector') -> 'Vector':
         return Vector(x=self.x + other.x, y=self.y + other.y, z=self.z + other.z)
 
@@ -205,14 +209,19 @@ def find_scanner_placements(
 
 def main():
     scanners = read_input()
-
     scanner_placements = find_scanner_placements(scanners=scanners)
+
     beacons = {
         beacon
         for placement in scanner_placements.values()
         for beacon in placement.beacons()
     }
     print(len(beacons))
+
+    scanner_positions = {
+        placement.position for placement in scanner_placements.values()
+    }
+    print(max(a.distance(b) for a, b in combinations(scanner_positions, 2)))
 
 
 if __name__ == '__main__':
