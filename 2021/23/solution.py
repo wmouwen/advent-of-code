@@ -106,7 +106,7 @@ class Hallway:
             min(room_index, hallway_index),
             max(room_index, hallway_index) + 1,
         ):
-            if  i != hallway_index and isinstance(self.situation[i], str):
+            if i != hallway_index and isinstance(self.situation[i], str):
                 return False
 
         return True
