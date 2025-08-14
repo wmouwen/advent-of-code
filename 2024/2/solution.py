@@ -5,30 +5,10 @@ def sign(num: int) -> int:
     return int(num / abs(num)) if num != 0 else 0
 
 
-def is_safe(levels: list[int]) -> bool:
-    if len(levels) < 2:
-        return True
+def safe(levels: list[int]) -> bool:
+    diffs = [levels[i + 1] - levels[i] for i in range(len(levels) - 1)]
 
-    slope = sign(levels[1] - levels[0])
-    if slope == 0:
-        return False
-
-    for i in range(len(levels) - 1):
-        if sign(levels[i + 1] - levels[i]) != slope:
-            return False
-
-        if not (1 <= abs(levels[i + 1] - levels[i]) <= 3):
-            return False
-
-    return True
-
-
-def is_safe_tolerated(levels: list[int]) -> bool:
-    for i in range(len(levels)):
-        if is_safe(list(levels[:i] + levels[i + 1 :])):
-            return True
-
-    return False
+    return all(abs(diff) <= 3 and sign(diff) == sign(diffs[0]) for diff in diffs)
 
 
 def main():
@@ -37,9 +17,9 @@ def main():
     for line in sys.stdin:
         levels = list(map(int, line.strip().split()))
 
-        if is_safe(levels):
+        if safe(levels):
             safe_complete += 1
-        elif is_safe_tolerated(levels):
+        elif any(safe(levels[:i] + levels[i + 1 :]) for i in range(len(levels))):
             safe_tolerated += 1
 
     print(safe_complete)
