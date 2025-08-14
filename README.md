@@ -310,6 +310,20 @@ to `stdout`.
 
 ## Technologies
 
+### Go
+
+To run the Go scripts, you need to perform the following steps:
+
+1. Install [Go](https://go.dev/).
+
+2. Run the solution for the required day.
+   ```shell
+   year=2015
+   day=1
+   set="puzzle"
+   go run "./$year/$day/solution.go" < "./problems/$year/$day/inputs/$set.txt"
+   ```
+
 ### PHP
 
 To run the PHP scripts, you need to perform the following steps:
@@ -365,20 +379,19 @@ To run the Rust scripts, you need to perform the following steps:
 1. Install [Rust](https://www.rust-lang.org/).
 
 2. Build and run the solution for the required day. Choose one of two options:
+   ```shell
+   year=2015
+   day=1
+   set="puzzle"
+   rustc -o "./$year/$day/solution.out" "./$year/$day/solution.rs" &&\
+   "./$year/$day/solution.out" < "./problems/$year/$day/inputs/$set.txt"
+   ```
 
-    1. Using Cargo.
-       ```shell
-       year=2015
-       day=1
-       set="puzzle"
-       cargo run --bin "$year-$day" < "./problems/$year/$day/inputs/$set.txt"
-       ```
+Alternatively you can use Cargo to build and run the solution:
 
-    2. Using Rust Compiler.
-       ```shell
-       year=2015
-       day=1
-       set="puzzle"
-       rustc -o "./$year/$day/solution.out" "./$year/$day/solution.rs" &&\
-       "./$year/$day/solution.out" < "./problems/$year/$day/inputs/$set.txt"
-       ```
+```shell
+year=2015
+day=1
+set="puzzle"
+cargo run --bin "$year-$day" < "./problems/$year/$day/inputs/$set.txt"
+```
