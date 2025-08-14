@@ -13,5 +13,6 @@ def main():
     print(floor)
     print(first_negative)
 
+
 if __name__ == '__main__':
     main()
