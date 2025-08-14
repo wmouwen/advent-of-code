@@ -1,12 +1,10 @@
-# Personal addition
+# Personal additions
 problems/
 
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[codz]
 *$py.class
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -26,7 +24,17 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Unit test / coverage reports
+
+# Rust
+debug/
+target/
+*.rs.bk
+mutants.out*/
+
+# PHP
+vendor/
+
+# Test coverage
 htmlcov/
 .tox/
 .nox/

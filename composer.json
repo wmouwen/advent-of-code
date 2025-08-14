@@ -1,0 +1,14 @@
+{
+    "name": "wmouwen/advent-of-code",
+    "description": "Personal solutions to the problems published by the Advent of Code yearly events",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Willem Mouwen",
+            "email": "willem@mouwen.dev"
+        }
+    ],
+    "require": {
+        "php": "^8.4"
+    }
+}

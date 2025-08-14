@@ -3,10 +3,12 @@
 This repository contains a set of solutions to the problems published by [Eric Wastl](https://github.com/topaz) for his
 yearly [Advent of Code](https://adventofcode.com/) event.
 
-The repository contains a mixture of different programming languages. Solutions
-are made to read from `stdin` and output to `stdout`.
+The repository contains a mixture of different programming languages. Solutions are made to read from `stdin` and output
+to `stdout`.
 
-## 2015
+## Puzzles
+
+### 2015
 
 | Day | Name                                   | Problem                                      | Solution        | Stars |
 |----:|:---------------------------------------|:---------------------------------------------|:----------------|:------|
@@ -36,7 +38,7 @@ are made to read from `stdin` and output to `stdout`.
 |  24 | It Hangs in the Balance                | [link](https://adventofcode.com/2015/day/24) | [link](2015/24) | ★★    |
 |  25 | Let It Snow                            | [link](https://adventofcode.com/2015/day/25) | [link](2015/25) | ★★    |
 
-## 2016
+### 2016
 
 | Day | Name                                   | Problem                                      | Solution        | Stars |
 |----:|:---------------------------------------|:---------------------------------------------|:----------------|:------|
@@ -66,7 +68,7 @@ are made to read from `stdin` and output to `stdout`.
 |  24 | Air Duct Spelunking                    | [link](https://adventofcode.com/2016/day/24) | [link](2016/24) | ★★    |
 |  25 | Clock Signal                           | [link](https://adventofcode.com/2016/day/25) | [link](2016/25) | ★★    |
 
-## 2017
+### 2017
 
 | Day | Name                                    | Problem                                      | Solution        | Stars |
 |----:|:----------------------------------------|:---------------------------------------------|:----------------|:------|
@@ -96,7 +98,7 @@ are made to read from `stdin` and output to `stdout`.
 |  24 | Electromagnetic Moat                    | [link](https://adventofcode.com/2017/day/24) | [link](2017/24) | ★★    |
 |  25 | The Halting Problem                     | [link](https://adventofcode.com/2017/day/25) | [link](2017/25) | ★★    |
 
-## 2018
+### 2018
 
 | Day | Name                                 | Problem                                      | Solution        | Stars |
 |----:|:-------------------------------------|:---------------------------------------------|:----------------|:------|
@@ -126,7 +128,7 @@ are made to read from `stdin` and output to `stdout`.
 |  24 | Immune System Simulator 20XX         | [link](https://adventofcode.com/2018/day/24) | [link](2018/24) | ★★    |
 |  25 | Four-Dimensional Adventure           | [link](https://adventofcode.com/2018/day/25) | [link](2018/25) | ★★    |
 
-## 2019
+### 2019
 
 | Day | Name                               | Problem                                      | Solution        | Stars |
 |----:|:-----------------------------------|:---------------------------------------------|:----------------|:------|
@@ -156,7 +158,7 @@ are made to read from `stdin` and output to `stdout`.
 |  24 | Planet of Discord                  | [link](https://adventofcode.com/2019/day/24) | [link](2019/24) | ★★    |
 |  25 | Cryostasis                         | [link](https://adventofcode.com/2019/day/25) | [link](2019/25) | ★★    |
 
-## 2020
+### 2020
 
 | Day | Name                    | Problem                                      | Solution        | Stars |
 |----:|:------------------------|:---------------------------------------------|:----------------|:------|
@@ -186,7 +188,7 @@ are made to read from `stdin` and output to `stdout`.
 |  24 | Lobby Layout            | [link](https://adventofcode.com/2020/day/24) | [link](2020/24) | ★★    |
 |  25 | Combo Breaker           | [link](https://adventofcode.com/2020/day/25) | [link](2020/25) | ★★    |
 
-## 2021
+### 2021
 
 | Day | Name                    | Problem                                      | Solution        | Stars |
 |----:|:------------------------|:---------------------------------------------|:----------------|:------|
@@ -216,7 +218,7 @@ are made to read from `stdin` and output to `stdout`.
 |  24 | Arithmetic Logic Unit   | [link](https://adventofcode.com/2021/day/24) | [link](2021/24) | ★★    |
 |  25 | Sea Cucumber            | [link](https://adventofcode.com/2021/day/25) | [link](2021/25) | ★★    |
 
-## 2022
+### 2022
 
 | Day | Name                     | Problem                                      | Solution        | Stars |
 |----:|:-------------------------|:---------------------------------------------|:----------------|:------|
@@ -246,7 +248,7 @@ are made to read from `stdin` and output to `stdout`.
 |  24 | Blizzard Basin           | [link](https://adventofcode.com/2022/day/24) | [link](2022/24) | ★★    |
 |  25 | Full of Hot Air          | [link](https://adventofcode.com/2022/day/25) | [link](2022/25) | ★★    |
 
-## 2023
+### 2023
 
 | Day | Name                            | Problem                                      | Solution        | Stars |
 |----:|:--------------------------------|:---------------------------------------------|:----------------|:------|
@@ -276,7 +278,7 @@ are made to read from `stdin` and output to `stdout`.
 |  24 | Never Tell Me The Odds          | [link](https://adventofcode.com/2023/day/24) | [link](2023/24) | ★★    |
 |  25 | Snowverload                     | [link](https://adventofcode.com/2023/day/25) | [link](2023/25) | ★★    |
 
-## 2024
+### 2024
 
 | Day | Name                   | Problem                                      | Solution        | Stars |
 |----:|:-----------------------|:---------------------------------------------|:----------------|:------|
@@ -305,3 +307,68 @@ are made to read from `stdin` and output to `stdout`.
 |  23 | LAN Party              | [link](https://adventofcode.com/2024/day/23) | [link](2024/23) | ★★    |
 |  24 | Crossed Wires          | [link](https://adventofcode.com/2024/day/24) | [link](2024/24) | ★★    |
 |  25 | Code Chronicle         | [link](https://adventofcode.com/2024/day/25) | [link](2024/25) | ★★    |
+
+## Technologies
+
+### PHP
+
+To run the PHP scripts, you need to perform the following steps:
+
+1. Install [PHP](https://www.php.net/) and [Composer](https://getcomposer.org/).
+
+2. Assert a valid installation.
+   ```shell
+   composer check-platform-reqs
+   ```
+
+3. Build and run the solution for the required day.
+   ```shell
+   year="2015"
+   day="1"
+   set="puzzle"
+   php "./$year/$day/solution.php" < "./problems/$year/$day/inputs/$set.txt"
+   ```
+
+### Python
+
+To run the Python scripts, you need to perform the following steps:
+
+1. Install [Python](https://www.python.org/) and [pip](https://pypi.org/project/pip/).
+
+2. Start a virtual environment.
+   ```shell
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment.
+   ```shell
+   source venv/bin/activate
+   ```
+
+4. Install the dependencies.
+   ```shell
+   pip install -e .
+   ```
+
+5. Run the solution for the required day.
+   ```shell
+   year="2015"
+   day="1"
+   set="puzzle"
+   python "./$year/$day/solution.py" < "./problems/$year/$day/inputs/$set.txt"
+   ```
+
+### Rust
+
+To run the Rust scripts, you need to perform the following steps:
+
+1. Install [Rust](https://www.rust-lang.org/).
+
+2. Build and run the solution for the required day.
+   ```shell
+   year="2015"
+   day="1"
+   set="puzzle"
+   cargo build --bin "$year-$day" --release
+   "./target/release/$year-$day" < "./problems/$year/$day/inputs/$set.txt"
+   ```
