@@ -3,23 +3,15 @@ import sys
 
 
 def main():
-    left, right = [], []
+    lefts, rights = [], []
 
     for line in sys.stdin:
-        if match := re.match(r'^(?P<left>\d+)\s+(?P<right>\d+)$', line.strip()):
-            left.append(int(match['left']))
-            right.append(int(match['right']))
+        left, right = map(int, re.findall(r'\d+', line))
+        lefts.append(left)
+        rights.append(right)
 
-    left.sort()
-    right.sort()
-
-    print(sum(abs(left[i] - right[i]) for i in range(len(left))))
-    print(
-        sum(
-            left[i] * sum(1 for j in range(len(right)) if right[j] == left[i])
-            for i in range(len(left))
-        )
-    )
+    print(sum(abs(left - right) for left, right in zip(sorted(lefts), sorted(rights))))
+    print(sum(left * rights.count(left) for left in lefts))
 
 
 if __name__ == '__main__':
