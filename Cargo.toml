@@ -14,5 +14,9 @@ autotests = false
 autobenches = false
 
 [[bin]]
-name = "2015-1"             # The name of the target.
-path = "2015/1/solution.rs" # The source file of the target.
+name = "2015-1"
+path = "2015/1/solution.rs"
+
+[[bin]]
+name = "2015-2"
+path = "2015/2/solution.rs"

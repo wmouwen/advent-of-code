@@ -323,8 +323,8 @@ To run the PHP scripts, you need to perform the following steps:
 
 3. Build and run the solution for the required day.
    ```shell
-   year="2015"
-   day="1"
+   year=2015
+   day=1
    set="puzzle"
    php "./$year/$day/solution.php" < "./problems/$year/$day/inputs/$set.txt"
    ```
@@ -352,8 +352,8 @@ To run the Python scripts, you need to perform the following steps:
 
 5. Run the solution for the required day.
    ```shell
-   year="2015"
-   day="1"
+   year=2015
+   day=1
    set="puzzle"
    python "./$year/$day/solution.py" < "./problems/$year/$day/inputs/$set.txt"
    ```
@@ -366,9 +366,8 @@ To run the Rust scripts, you need to perform the following steps:
 
 2. Build and run the solution for the required day.
    ```shell
-   year="2015"
-   day="1"
+   year=2015
+   day=1
    set="puzzle"
-   cargo build --bin "$year-$day" --release
-   "./target/release/$year-$day" < "./problems/$year/$day/inputs/$set.txt"
+   cargo run --bin "$year-$day" < "./problems/$year/$day/inputs/$set.txt"
    ```
