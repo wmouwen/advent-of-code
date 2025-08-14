@@ -24,12 +24,12 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-
 # Rust
 debug/
 target/
 *.rs.bk
 mutants.out*/
+*.out
 
 # PHP
 vendor/

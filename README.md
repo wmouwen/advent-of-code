@@ -364,10 +364,21 @@ To run the Rust scripts, you need to perform the following steps:
 
 1. Install [Rust](https://www.rust-lang.org/).
 
-2. Build and run the solution for the required day.
-   ```shell
-   year=2015
-   day=1
-   set="puzzle"
-   cargo run --bin "$year-$day" < "./problems/$year/$day/inputs/$set.txt"
-   ```
+2. Build and run the solution for the required day. Choose one of two options:
+
+    1. Using Cargo.
+       ```shell
+       year=2015
+       day=1
+       set="puzzle"
+       cargo run --bin "$year-$day" < "./problems/$year/$day/inputs/$set.txt"
+       ```
+
+    2. Using Rust Compiler.
+       ```shell
+       year=2015
+       day=1
+       set="puzzle"
+       rustc -o "./$year/$day/solution.out" "./$year/$day/solution.rs" &&\
+       "./$year/$day/solution.out" < "./problems/$year/$day/inputs/$set.txt"
+       ```
