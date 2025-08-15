@@ -2,18 +2,20 @@ import math
 import statistics
 import sys
 
-input = [int(point) for point in sys.stdin.readline().strip().split(',')]
 
-# Part 1
-median = int(statistics.median(input))
-print(sum(abs(start - median) for start in input))
+def main():
+    points = tuple(map(int, sys.stdin.readline().strip().split(',')))
 
-# Part 2
-mean = statistics.mean(input)
-candidates = range(math.floor(mean), math.ceil(mean) + 1)
-print(
-    min(
-        sum((dist := abs(start - candidate)) * (dist + 1) // 2 for start in input)
-        for candidate in candidates
+    median = int(statistics.median(points))
+    print(sum(abs(point - median) for point in points))
+
+    mean = statistics.mean(points)
+    fuel = min(
+        sum((dist := abs(point - candidate)) * (dist + 1) // 2 for point in points)
+        for candidate in range(math.floor(mean), math.ceil(mean) + 1)
     )
-)
+    print(fuel)
+
+
+if __name__ == '__main__':
+    main()
