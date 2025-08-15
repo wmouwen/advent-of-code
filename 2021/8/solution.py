@@ -1,67 +1,78 @@
 import sys
 
-occurences = 0
-total = 0
 
-for line in sys.stdin:
-    digits, code = (
-        [''.join(sorted(digit)) for digit in parts.split()] for parts in line.split('|')
-    )
+def main():
+    occurrences = 0
+    total = 0
 
-    digit_map = {
-        1: next(d for d in digits if len(d) == 2),
-        4: next(d for d in digits if len(d) == 4),
-        7: next(d for d in digits if len(d) == 3),
-        8: next(d for d in digits if len(d) == 7),
-    }
-
-    occurences += len([digit for digit in code if digit in digit_map.values()])
-
-    digit_map.update(
-        {
-            3: next(
-                d
-                for d in digits
-                if len(d) == 5 and all(char in d for char in digit_map[1])
-            ),
-            6: next(
-                d
-                for d in digits
-                if len(d) == 6 and any(char not in d for char in digit_map[1])
-            ),
-            9: next(
-                d
-                for d in digits
-                if len(d) == 6 and all(char in d for char in digit_map[4])
-            ),
-        }
-    )
-
-    digit_map.update(
-        {
-            5: next(
-                d
-                for d in digits
-                if len(d) == 5
-                and d not in digit_map.values()
-                and sum([c in d for c in digit_map[4]]) == 3
-            ),
-        }
-    )
-
-    digit_map.update(
-        {
-            0: next(d for d in digits if len(d) == 6 and d not in digit_map.values()),
-            2: next(d for d in digits if len(d) == 5 and d not in digit_map.values()),
-        }
-    )
-
-    total += int(
-        ''.join(
-            next(str(key) for key, value in digit_map.items() if value == digit)
-            for digit in code
+    for line in sys.stdin:
+        digits, code = (
+            [''.join(sorted(digit)) for digit in parts.split()]
+            for parts in line.split('|')
         )
-    )
 
-print(occurences)
-print(total)
+        mapping = {
+            1: next(digit for digit in digits if len(digit) == 2),
+            4: next(digit for digit in digits if len(digit) == 4),
+            7: next(digit for digit in digits if len(digit) == 3),
+            8: next(digit for digit in digits if len(digit) == 7),
+        }
+
+        occurrences += sum(1 for digit in code if digit in mapping.values())
+
+        mapping.update(
+            {
+                3: next(
+                    digit
+                    for digit in digits
+                    if len(digit) == 5 and all(char in digit for char in mapping[1])
+                ),
+                6: next(
+                    digit
+                    for digit in digits
+                    if len(digit) == 6 and any(char not in digit for char in mapping[1])
+                ),
+                9: next(
+                    digit
+                    for digit in digits
+                    if len(digit) == 6 and all(char in digit for char in mapping[4])
+                ),
+            }
+        )
+        mapping.update(
+            {
+                5: next(
+                    digit
+                    for digit in digits
+                    if len(digit) == 5
+                    and digit not in mapping.values()
+                    and sum([char in digit for char in mapping[4]]) == 3
+                ),
+            }
+        )
+        mapping.update(
+            {
+                0: next(
+                    digit
+                    for digit in digits
+                    if len(digit) == 6 and digit not in mapping.values()
+                ),
+                2: next(
+                    digit
+                    for digit in digits
+                    if len(digit) == 5 and digit not in mapping.values()
+                ),
+            }
+        )
+
+        reverse_mapping = {value: key for key, value in mapping.items()}
+        total += int(
+            ''.join(str(reverse_mapping[digit]) for i, digit in enumerate(code))
+        )
+
+    print(occurrences)
+    print(total)
+
+
+if __name__ == '__main__':
+    main()
