@@ -1,70 +1,56 @@
 import sys
-from collections import namedtuple
+from collections import defaultdict
+from dataclasses import dataclass
 from itertools import combinations
 
-Vector = namedtuple('Vector', 'y x')
+
+@dataclass(frozen=True)
+class Vector:
+    x: int
+    y: int
+
+    def __add__(self, other: 'Vector') -> 'Vector':
+        return Vector(x=self.x + other.x, y=self.y + other.y)
+
+    def __sub__(self, other: 'Vector') -> 'Vector':
+        return Vector(x=self.x - other.x, y=self.y - other.y)
+
+    def __mul__(self, factor: int) -> 'Vector':
+        return Vector(x=self.x * factor, y=self.y * factor)
+
+
+def nodes_in_grid(grid: list[list[str]], antinodes: set[Vector]) -> set[Vector]:
+    return {
+        antinode
+        for antinode in antinodes
+        if 0 <= antinode.x < len(grid[0]) and 0 <= antinode.y < len(grid)
+    }
 
 
 def main():
     grid = [list(line.strip()) for line in sys.stdin if line.strip() != '']
-    y_max, x_max = len(grid) - 1, len(grid[0]) - 1
+    grid_size = max(len(grid), len(grid[0]))
 
-    antennas: dict[str, set[Vector]] = {}
+    antennas = defaultdict(set)
+
     for y, row in enumerate(grid):
         for x, cell in enumerate(row):
-            if cell == '.':
-                continue
-            if cell not in antennas:
-                antennas[cell] = set()
-            antennas[cell].add(Vector(y=y, x=x))
+            if cell != '.':
+                antennas[cell].add(Vector(y=y, x=x))
 
-    antinodes_close: set[Vector] = set()
-    antinodes_all: set[Vector] = set()
+    antinodes_close, antinodes_all = set(), set()
 
     for antenna_set in antennas.values():
-        for combination in combinations(antenna_set, 2):
-            y_offset, x_offset = (
-                combination[0].y - combination[1].y,
-                combination[0].x - combination[1].x,
-            )
+        for a, b in combinations(antenna_set, 2):
+            offset = a - b
+            antinodes_close.add(a + offset)
+            antinodes_close.add(b - offset)
 
-            antinodes_close.add(
-                Vector(y=combination[0].y + y_offset, x=combination[0].x + x_offset)
-            )
-            antinodes_close.add(
-                Vector(y=combination[1].y - y_offset, x=combination[1].x - x_offset)
-            )
+            for k in range(-1 * grid_size, grid_size):
+                antinodes_all.add(a + offset * k)
 
-            for k in range(-1 * max(y_max, x_max), max(y_max, x_max)):
-                antinodes_all.add(
-                    Vector(
-                        y=combination[0].y + y_offset * k,
-                        x=combination[0].x + x_offset * k,
-                    )
-                )
-
-    print(
-        len(
-            list(
-                filter(
-                    lambda antinode: 0 <= antinode.x <= x_max
-                    and 0 <= antinode.y <= y_max,
-                    antinodes_close,
-                )
-            )
-        )
-    )
-    print(
-        len(
-            list(
-                filter(
-                    lambda antinode: 0 <= antinode.x <= x_max
-                    and 0 <= antinode.y <= y_max,
-                    antinodes_all,
-                )
-            )
-        )
-    )
+    print(len(nodes_in_grid(grid, antinodes_close)))
+    print(len(nodes_in_grid(grid, antinodes_all)))
 
 
 if __name__ == '__main__':
