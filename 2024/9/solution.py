@@ -1,76 +1,106 @@
 import sys
-from typing import NamedTuple
+from collections import defaultdict
+from dataclasses import dataclass
 
-DiskMap = list[int]
 
-
-class File(NamedTuple):
+@dataclass(frozen=True)
+class File:
     id: int
-    size: int
+    position: int
+    length: int
+
+    def checksum(self) -> int:
+        return sum(self.id * (self.position + i) for i in range(self.length))
 
 
-Disk = list[File | None]
+@dataclass(frozen=True)
+class Disk:
+    files: list[File]
+
+    def checksum(self) -> int:
+        return sum(file.checksum() for file in self.files)
+
+    def defragment_blocks(self) -> 'Disk':
+        files = sorted(self.files, key=lambda f: f.position)
+
+        # Loop through the gaps in between files. Use a while-loop as the length of
+        # the files list will grow as we move files into gaps.
+        gap_index = 0
+        while gap_index < len(files) - 1:
+            gap_position = files[gap_index].position + files[gap_index].length
+            gap_length = files[gap_index + 1].position - gap_position
+
+            if gap_length > 0:
+                # Move the last file into the gap, split the file if necessary
+                move_file = files.pop()
+
+                new_file = File(
+                    id=move_file.id,
+                    position=gap_position,
+                    length=min(gap_length, move_file.length),
+                )
+                files.insert(gap_index + 1, new_file)
+
+                if move_file.length > gap_length:
+                    new_file = File(
+                        id=move_file.id,
+                        position=move_file.position,
+                        length=move_file.length - gap_length,
+                    )
+                    files.append(new_file)
+
+            gap_index += 1
+
+        return Disk(files=files)
+
+    def defragment_files(self) -> 'Disk':
+        files = sorted(self.files, key=lambda f: f.position)
+
+        # Track the first occurrence of each file length to optimize gap finding
+        first_gaps = defaultdict(int)
+
+        # Loop backwards through files
+        for move_index in range(len(files) - 1, 0, -1):
+            move_file = files[move_index]
+
+            # Find the first gap that can accommodate the current file
+            for gap_index in range(first_gaps[move_file.length], move_index):
+                gap_position = files[gap_index].position + files[gap_index].length
+                gap_length = files[gap_index + 1].position - gap_position
+
+                if move_file.length <= gap_length:
+                    # Move the new file in its entirety
+                    files.pop(move_index)
+                    new_file = File(
+                        id=move_file.id,
+                        position=gap_position,
+                        length=move_file.length,
+                    )
+                    files.insert(gap_index + 1, new_file)
+
+                    first_gaps[move_file.length] = gap_index + 1
+                    break
+
+        return Disk(files=files)
 
 
-def build_disk(disk_map: DiskMap) -> Disk:
-    disk = []
+def read_input() -> Disk:
+    disk_map = tuple(map(int, sys.stdin.readline().strip()))
 
+    files, position = [], 0
     for key, value in enumerate(disk_map):
-        if key % 2 == 0:
-            file = File(id=key // 2, size=value)
-            disk.extend([file] * file.size)
-        else:
-            disk.extend([None] * int(value))
+        if not key & 1:
+            files.append(File(id=key >> 1, position=position, length=value))
 
-    return disk
+        position += value
 
-
-def checksum(disk: Disk) -> int:
-    return sum(index * file.id for index, file in enumerate(disk) if file is not None)
-
-
-def defragment_blocks(disk: Disk) -> Disk:
-    index = 0
-
-    while index < len(disk):
-        while disk[index] is None:
-            disk[index] = disk.pop()
-
-        index += 1
-        while disk[-1] is None:
-            disk.pop()
-
-    return disk
-
-
-def defragment_files(disk: Disk) -> Disk:
-    index = len(disk) - 1
-
-    while index >= 0:
-        if isinstance(disk[index], File) and (
-            disk[index - 1] is None or disk[index - 1].id != disk[index].id
-        ):
-            for candidate_start in range(index):
-                if not all(
-                    disk[candidate_start + b] is None for b in range(disk[index].size)
-                ):
-                    continue
-
-                for b in range(disk[index].size):
-                    disk[candidate_start + b] = disk[index + b]
-                    disk[index + b] = None
-                break
-
-        index -= 1
-
-    return disk
+    return Disk(files=files)
 
 
 def main():
-    disk = build_disk(list(map(int, sys.stdin.readline().strip())))
-
-    print(checksum(defragment_blocks(disk.copy())))
-    print(checksum(defragment_files(disk.copy())))
+    disk = read_input()
+    print(disk.defragment_blocks().checksum())
+    print(disk.defragment_files().checksum())
 
 
 if __name__ == '__main__':
