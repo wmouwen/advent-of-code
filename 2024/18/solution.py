@@ -1,57 +1,89 @@
 import sys
-from queue import Queue
+from queue import PriorityQueue
+from typing import NamedTuple
 
-dirs = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+
+class Vector(NamedTuple):
+    x: int
+    y: int
+
+    @property
+    def length(self) -> int:
+        return abs(self.x) + abs(self.y)
+
+    def __add__(self, other: 'Vector') -> 'Vector':
+        return Vector(x=self.x + other.x, y=self.y + other.y)
+
+    def __sub__(self, other: 'Vector') -> 'Vector':
+        return Vector(x=self.x - other.x, y=self.y - other.y)
 
 
-def floodfill(grid):
-    distances: list[list[int | None]] = [
-        [None for _ in range(len(grid))] for _ in range(len(grid))
-    ]
-    distances[0][0] = 0
+GRID_SIZE = Vector(x=70, y=70)
+DIRECTIONS = [Vector(x=0, y=-1), Vector(x=1, y=0), Vector(x=0, y=1), Vector(x=-1, y=0)]
 
-    queue = Queue()
-    queue.put((0, 0, 0))
+
+def shortest_path(
+    walls: set[Vector], source: Vector, target: Vector
+) -> list[Vector] | None:
+    visited = set()
+
+    queue: PriorityQueue[tuple[int, int, list[Vector]]] = PriorityQueue()
+    queue.put((0, 0, [source]))
+
     while not queue.empty():
-        distance, x, y = queue.get()
+        _, _, path = queue.get()
 
-        for dx, dy in dirs:
-            if not (0 <= x + dx < len(grid) and 0 <= y + dy < len(grid)):
+        curr_pos = path[-1]
+        if curr_pos in visited:
+            continue
+
+        visited.add(curr_pos)
+
+        for move in DIRECTIONS:
+            next_pos = curr_pos + move
+
+            if next_pos == target:
+                return path + [next_pos]
+
+            if not (0 <= next_pos.x <= target.x and 0 <= next_pos.y <= target.y):
                 continue
 
-            if distances[y + dy][x + dx] is not None or grid[y + dy][x + dx] == '#':
-                continue
+            if next_pos not in walls:
+                queue.put(
+                    (
+                        len(path),
+                        (GRID_SIZE - next_pos).length,
+                        path + [next_pos],
+                    )
+                )
 
-            distances[y + dy][x + dx] = distance + 1
-            queue.put((distance + 1, x + dx, y + dy))
-
-    return distances
+    return None
 
 
 def main():
-    grid_size = 71
-    lap_count = 1024
+    walls: set[Vector] = set()
 
-    grid = [['.' for _ in range(grid_size)] for _ in range(grid_size)]
-
-    for i in range(lap_count):
-        line = sys.stdin.readline()
-        if line.strip() == '':
+    for _ in range(1024):
+        line = sys.stdin.readline().strip()
+        if not line:
             break
 
         x, y = map(int, line.split(','))
-        grid[y][x] = '#'
+        walls.add(Vector(x=x, y=y))
 
-    distances = floodfill(grid)
-    print(distances[grid_size - 1][grid_size - 1])
+    path = shortest_path(walls, Vector(0, 0), GRID_SIZE)
+    print(len(path) - 1)
 
     for line in sys.stdin:
-        x, y = map(int, line.split(','))
-        grid[y][x] = '#'
-        distances = floodfill(grid)
-        if distances[-1][-1] is None:
-            print(f'{x},{y}')
-            break
+        x, y = map(int, line.strip().split(','))
+        walls.add(wall := Vector(x=x, y=y))
+
+        if wall in path:
+            path = shortest_path(walls, Vector(0, 0), GRID_SIZE)
+
+            if path is None:
+                print(line.strip())
+                break
 
 
 if __name__ == '__main__':
