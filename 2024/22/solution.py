@@ -2,46 +2,34 @@ import sys
 from collections import defaultdict
 
 
-def evolve(secret):
-    secret = ((secret << 6) ^ secret) & 16777215
-    secret = ((secret >> 5) ^ secret) & 16777215
-    secret = ((secret << 11) ^ secret) & 16777215
-
-    return secret
-
-
 def main():
-    last_secret_sum = 0
+    secrets_sum = 0
     gains = defaultdict(int)
 
-    for line in sys.stdin:
-        if line.strip() == '':
-            break
+    for secret in map(int, sys.stdin.readlines()):
+        if not secret:
+            continue
 
-        secret = int(line.strip())
-        prices = [secret % 10]
-        changes = []
-        sequences = dict()
+        sequence, seen = tuple(), set()
 
         for _ in range(2000):
-            secret = evolve(secret)
+            old_price = secret % 10
 
-            prices.append(secret % 10)
-            changes.append(prices[-1] - prices[-2])
+            secret = ((secret * 64) ^ secret) % 16777216
+            secret = (secret // 32) ^ secret
+            secret = ((secret * 2048) ^ secret) % 16777216
 
-            if (
-                len(changes) >= 4
-                and (seq := tuple(changes[-4:])) not in sequences.keys()
-            ):
-                sequences[seq] = prices[-1]
+            price = secret % 10
 
-        last_secret_sum += secret
+            sequence = sequence[-3:] + (price - old_price,)
+            if len(sequence) == 4 and sequence not in seen:
+                gains[sequence] += price
+                seen.add(sequence)
 
-        for seq, price in sequences.items():
-            gains[seq] += price
+        secrets_sum += secret
 
-    print(last_secret_sum)
-    print(max(gain for gain in gains.values()))
+    print(secrets_sum)
+    print(max(gains.values()))
 
 
 if __name__ == '__main__':
