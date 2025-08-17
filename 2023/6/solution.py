@@ -1,20 +1,32 @@
 import re
 import sys
+from math import sqrt, ceil, floor, prod
 
-times = re.findall(r'\d+', sys.stdin.readline())
-distances = re.findall(r'\d+', sys.stdin.readline())
 
-part1 = 1
+def options(time: int, distance: int) -> int:
+    discriminator = time**2 - 4 * (distance + 1)
+    roots = (
+        (time - sqrt(discriminator)) / 2,
+        (time + sqrt(discriminator)) / 2,
+    )
 
-for i in range(len(times)):
-    time = int(times[i])
-    distance = int(distances[i])
+    option_count = min(distance - 1, floor(roots[1])) - max(1, ceil(roots[0])) + 1
 
-    options = sum(1 for x in range(1, time) if (time - x) * x > distance)
-    part1 *= options
+    return max(0, option_count)
 
-print(part1)
 
-time = int(''.join(times))
-distance = int(''.join(distances))
-print(sum(1 for x in range(1, time) if (time - x) * x > distance))
+def main():
+    times = re.findall(r'\d+', sys.stdin.readline())
+    distances = re.findall(r'\d+', sys.stdin.readline())
+
+    options_prod = prod(
+        options(time, distance)
+        for time, distance in zip(map(int, times), map(int, distances))
+    )
+    print(options_prod)
+
+    print(options(int(''.join(times)), int(''.join(distances))))
+
+
+if __name__ == '__main__':
+    main()
