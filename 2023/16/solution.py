@@ -1,4 +1,7 @@
 import sys
+from functools import cache
+from operator import itemgetter
+from queue import Queue
 from typing import NamedTuple
 
 
@@ -6,99 +9,78 @@ class Vector(NamedTuple):
     x: int
     y: int
 
-
-class Beam(NamedTuple):
-    location: Vector
-    direction: str
-
-
-directions = {
-    'R': Vector(x=1, y=0),
-    'D': Vector(x=0, y=1),
-    'L': Vector(x=-1, y=0),
-    'U': Vector(x=0, y=-1),
-}
+    @cache
+    def __add__(self, other: 'Vector') -> 'Vector':
+        return Vector(x=self.x + other.x, y=self.y + other.y)
 
 
-def energized_tiles(contraption: tuple, start: Beam) -> int:
-    beams = tuple(tuple([] for tile in row) for row in contraption)
-    todo: [(Vector, str)] = [start]
+DIRECTIONS = (
+    Vector(x=0, y=-1),
+    Vector(x=1, y=0),
+    Vector(x=0, y=1),
+    Vector(x=-1, y=0),
+)
 
-    while todo:
-        beam = todo.pop()
 
-        # Check out of bounds
-        if not 0 <= beam.location.y < len(beams) or not 0 <= beam.location.x < len(
-            beams[beam.location.y]
+@cache
+def next_orientations(orientation: int, cell: str) -> set[int]:
+    match cell:
+        case '.':
+            return {orientation}
+        case '/':
+            return {orientation ^ 1}
+        case '\\':
+            return {3 - orientation}
+        case '|':
+            return {0, 2} if orientation & 1 else {orientation}
+        case '-':
+            return {1, 3} if not orientation & 1 else {orientation}
+        case _:
+            raise ValueError(f'Unknown cell type: {cell}')
+
+
+def beam(grid: list[str], start: tuple[Vector, int]) -> set[Vector]:
+    queue: Queue[tuple[Vector, int]] = Queue()
+
+    for next_orientation in next_orientations(start[1], grid[start[0].y][start[0].x]):
+        queue.put((start[0], next_orientation))
+
+    visited = set()
+
+    while not queue.empty():
+        position, orientation = queue.get()
+
+        if (position, orientation) in visited:
+            continue
+        visited.add((position, orientation))
+
+        next_pos = position + DIRECTIONS[orientation]
+        if not (
+            0 <= next_pos.y < len(grid) and 0 <= next_pos.x < len(grid[next_pos.y])
         ):
             continue
 
-        # Check revisit
-        if beam.direction in beams[beam.location.y][beam.location.x]:
-            continue
+        cell = grid[next_pos.y][next_pos.x]
+        for next_orientation in next_orientations(orientation, cell):
+            queue.put((next_pos, next_orientation))
 
-        # Energize field
-        beams[beam.location.y][beam.location.x].append(beam.direction)
-
-        # Forward beam
-        new_directions = []
-
-        if contraption[beam.location.y][beam.location.x] == '.':
-            new_directions.append(beam.direction)
-        elif contraption[beam.location.y][beam.location.x] == '/':
-            new_directions.append(
-                {'R': 'U', 'D': 'L', 'L': 'D', 'U': 'R'}[beam.direction]
-            )
-        elif contraption[beam.location.y][beam.location.x] == '\\':
-            new_directions.append(
-                {'R': 'D', 'D': 'R', 'L': 'U', 'U': 'L'}[beam.direction]
-            )
-        elif contraption[beam.location.y][beam.location.x] == '|':
-            new_directions.extend(
-                ['D', 'U'] if beam.direction in ['R', 'L'] else beam.direction
-            )
-        elif contraption[beam.location.y][beam.location.x] == '-':
-            new_directions.extend(
-                ['R', 'L'] if beam.direction in ['D', 'U'] else beam.direction
-            )
-
-        for direction in new_directions:
-            todo.append(
-                Beam(
-                    location=Vector(
-                        x=beam.location.x + directions[direction].x,
-                        y=beam.location.y + directions[direction].y,
-                    ),
-                    direction=direction,
-                )
-            )
-
-    return sum(1 for row in beams for tile in row if tile)
+    return set(map(itemgetter(0), visited))
 
 
-contraption = tuple(tuple(line.strip()) for line in sys.stdin)
+def main():
+    grid = [line.strip() for line in sys.stdin]
 
-best = energized_tiles(contraption, Beam(location=Vector(x=0, y=0), direction='R'))
-print(best)
+    print(len(beam(grid, (Vector(x=0, y=0), 1))))
 
-for y in range(len(contraption)):
-    best = max(
-        best,
-        energized_tiles(contraption, Beam(location=Vector(x=0, y=y), direction='R')),
-        energized_tiles(
-            contraption,
-            Beam(location=Vector(x=len(contraption) - 1, y=y), direction='L'),
-        ),
-    )
+    best = 0
+    for x in range(len(grid[0])):
+        best = max(best, len(beam(grid, (Vector(x=x, y=0), 2))))
+        best = max(best, len(beam(grid, (Vector(x=x, y=len(grid) - 1), 0))))
+    for y in range(len(grid)):
+        best = max(best, len(beam(grid, (Vector(x=0, y=y), 1))))
+        best = max(best, len(beam(grid, (Vector(x=len(grid[y]) - 1, y=y), 3))))
+    print(best)
 
-for x in range(len(contraption[0])):
-    best = max(
-        best,
-        energized_tiles(contraption, Beam(location=Vector(x=x, y=0), direction='D')),
-        energized_tiles(
-            contraption,
-            Beam(location=Vector(x=x, y=len(contraption) - 1), direction='U'),
-        ),
-    )
 
-print(best)
+if __name__ == '__main__':
+    main()
