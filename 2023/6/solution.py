@@ -4,6 +4,9 @@ from math import sqrt, ceil, floor, prod
 
 
 def options(time: int, distance: int) -> int:
+    """
+    Solve equation (time - hold) * hold > distance, with 0 < hold < time
+    """
     discriminator = time**2 - 4 * (distance + 1)
     roots = (
         (time - sqrt(discriminator)) / 2,
