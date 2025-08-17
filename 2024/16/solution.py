@@ -1,4 +1,5 @@
 import sys
+from functools import cache
 from queue import PriorityQueue
 from typing import NamedTuple
 
@@ -11,9 +12,11 @@ class Vector(NamedTuple):
     def length(self) -> int:
         return abs(self.x) + abs(self.y)
 
+    @cache
     def __add__(self, other: 'Vector') -> 'Vector':
         return Vector(x=self.x + other.x, y=self.y + other.y)
 
+    @cache
     def __sub__(self, other: 'Vector') -> 'Vector':
         return Vector(x=self.x - other.x, y=self.y - other.y)
 
@@ -39,7 +42,7 @@ def main():
     source = next(Vector(x=x, y=y) for x, y in nodes if grid[y][x] == 'S')
     target = next(Vector(x=x, y=y) for x, y in nodes if grid[y][x] == 'E')
 
-    shortest_distance, shortest_paths = None, set()
+    shortest_distance, shortest_paths = None, list()
 
     queue: PriorityQueue[tuple[int, int, tuple[Vector, ...], int]] = PriorityQueue()
     queue.put((0, 0, (source,), 1))
@@ -65,7 +68,7 @@ def main():
                 shortest_distance = distance
                 shortest_paths.clear()
             if distance == shortest_distance:
-                shortest_paths.add(frozenset(path))
+                shortest_paths.append(path)
             continue
 
         for turn in range(-1, 2):
