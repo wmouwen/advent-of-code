@@ -1,110 +1,91 @@
 import sys
 from queue import PriorityQueue
-
-dirs = ['N', 'E', 'S', 'W']
-
-
-class Cell:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.neighbors = dict()
+from typing import NamedTuple
 
 
-def find_shortest_paths(cells, start, end):
-    distances = {}
-    shortest_paths = {}
+class Vector(NamedTuple):
+    x: int
+    y: int
 
-    queue = PriorityQueue()
-    queue.put((0, start.x, start.y, 'E', []))
+    @property
+    def length(self) -> int:
+        return abs(self.x) + abs(self.y)
 
-    while not queue.empty():
-        distance, x, y, direction, path = queue.get()
-        cell = cells[x, y]
+    def __add__(self, other: 'Vector') -> 'Vector':
+        return Vector(x=self.x + other.x, y=self.y + other.y)
 
-        if (cell, direction) in distances and distance > distances[cell, direction]:
-            continue
+    def __sub__(self, other: 'Vector') -> 'Vector':
+        return Vector(x=self.x - other.x, y=self.y - other.y)
 
-        if (cell, direction) in distances and distance == distances[cell, direction]:
-            shortest_paths[(cell, direction)].append(path)
 
-        if (cell, direction) not in distances or distance < distances[cell, direction]:
-            shortest_paths[(cell, direction)] = [path]
-            distances[(cell, direction)] = distance
-
-        if direction in cell.neighbors:
-            neighbor = cell.neighbors[direction]
-            queue.put(
-                (
-                    distance + 1,
-                    neighbor.x,
-                    neighbor.y,
-                    direction,
-                    path + [(x, y, direction)],
-                )
-            )
-
-        for turn in [-1, +1]:
-            new_direction = dirs[(dirs.index(direction) + turn) % len(dirs)]
-            queue.put(
-                (
-                    distance + 1000,
-                    cell.x,
-                    cell.y,
-                    new_direction,
-                    path + [(x, y, direction)],
-                )
-            )
-
-    return shortest_paths, distances
+DIRECTIONS = (
+    Vector(x=0, y=-1),
+    Vector(x=1, y=0),
+    Vector(x=0, y=1),
+    Vector(x=-1, y=0),
+)
 
 
 def main():
-    grid = [list(line.strip()) for line in sys.stdin]
+    grid = [line.strip() for line in sys.stdin]
 
-    cells = dict()
-    start, end = None, None
-    for y, row in enumerate(grid):
-        for x, cell in enumerate(row):
-            if cell == '#':
-                continue
-
-            cells[x, y] = Cell(x, y)
-            if cell == 'S':
-                start = cells[x, y]
-            if cell == 'E':
-                end = cells[x, y]
-
-            if (x - 1, y) in cells:
-                cells[x - 1, y].neighbors['E'] = cells[x, y]
-                cells[x, y].neighbors['W'] = cells[x - 1, y]
-
-            if (x, y - 1) in cells:
-                cells[x, y - 1].neighbors['S'] = cells[x, y]
-                cells[x, y].neighbors['N'] = cells[x, y - 1]
-
-    assert start is not None and end is not None
-
-    shortest_paths, distances = find_shortest_paths(cells, start, end)
-
-    min_distance = min(
-        distance for (cell, _), distance in distances.items() if cell == end
+    nodes = set(
+        Vector(x=x, y=y)
+        for y, row in enumerate(grid)
+        for x, cell in enumerate(row)
+        if cell in 'SE.'
     )
-    print(min_distance)
 
-    fields_on_optimal_path = {(start.x, start.y), (end.x, end.y)}
-    for direction in dirs:
-        if (end, direction) not in shortest_paths or distances[
-            (end, direction)
-        ] > min_distance:
+    source = next(Vector(x=x, y=y) for x, y in nodes if grid[y][x] == 'S')
+    target = next(Vector(x=x, y=y) for x, y in nodes if grid[y][x] == 'E')
+
+    shortest_distance, shortest_paths = None, set()
+
+    queue: PriorityQueue[tuple[int, int, tuple[Vector, ...], int]] = PriorityQueue()
+    queue.put((0, 0, (source,), 1))
+    queue.put((0, 1000, (source,), 0))
+
+    visited = dict()
+
+    while not queue.empty():
+        _, distance, path, orientation = queue.get()
+
+        if shortest_distance is not None and distance > shortest_distance:
             continue
 
-        for path in shortest_paths[(end, direction)]:
-            fields_on_optimal_path = fields_on_optimal_path.union(
-                set((x, y) for (x, y, _) in path)
-            )
+        current_position = path[-1]
 
-    print(len(fields_on_optimal_path))
+        visited_key = (path[-1], orientation)
+        if visited_key in visited and visited[visited_key] < distance:
+            continue
+        visited[visited_key] = distance
+
+        if current_position == target:
+            if shortest_distance is None or distance < shortest_distance:
+                shortest_distance = distance
+                shortest_paths.clear()
+            if distance == shortest_distance:
+                shortest_paths.add(frozenset(path))
+            continue
+
+        for turn in range(-1, 2):
+            next_orientation = (orientation + turn) % len(DIRECTIONS)
+            next_position = current_position + DIRECTIONS[next_orientation]
+
+            if next_position in nodes:
+                next_distance = distance + 1 + (abs(turn) * 1000)
+
+                queue.put(
+                    (
+                        next_distance + (target - next_position).length * 1000,
+                        next_distance,
+                        path + (next_position,),
+                        next_orientation,
+                    )
+                )
+
+    print(shortest_distance)
+    print(len(set(node for path in shortest_paths for node in path)))
 
 
 if __name__ == '__main__':
