@@ -308,6 +308,23 @@ to `stdout`.
 |  24 | Crossed Wires          | [link](https://adventofcode.com/2024/day/24) | [link](2024/24) | ★★    |
 |  25 | Code Chronicle         | [link](https://adventofcode.com/2024/day/25) | [link](2024/25) | ★★    |
 
+### 2025
+
+| Day | Name            | Problem                                      | Solution        | Stars |
+|----:|:----------------|:---------------------------------------------|:----------------|:------|
+|   1 | Secret Entrance | [link](https://adventofcode.com/2025/day/1)  | [link](2025/1)  | ★★    |
+|   2 |                 | [link](https://adventofcode.com/2025/day/2)  | [link](2025/2)  |       |
+|   3 |                 | [link](https://adventofcode.com/2025/day/3)  | [link](2025/3)  |       |
+|   4 |                 | [link](https://adventofcode.com/2025/day/4)  | [link](2025/4)  |       |
+|   5 |                 | [link](https://adventofcode.com/2025/day/5)  | [link](2025/5)  |       |
+|   6 |                 | [link](https://adventofcode.com/2025/day/6)  | [link](2025/6)  |       |
+|   7 |                 | [link](https://adventofcode.com/2025/day/7)  | [link](2025/7)  |       |
+|   8 |                 | [link](https://adventofcode.com/2025/day/8)  | [link](2025/8)  |       |
+|   9 |                 | [link](https://adventofcode.com/2025/day/9)  | [link](2025/9)  |       |
+|  10 |                 | [link](https://adventofcode.com/2025/day/10) | [link](2025/10) |       |
+|  11 |                 | [link](https://adventofcode.com/2025/day/11) | [link](2025/11) |       |
+|  12 |                 | [link](https://adventofcode.com/2025/day/12) | [link](2025/12) |       |
+
 ## Technologies
 
 ### Go

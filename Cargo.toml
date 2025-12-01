@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code"
-edition = "2024"
+edition = "2025"
 authors = [
     "Willem Mouwen <willem@mouwen.dev>"
 ]
