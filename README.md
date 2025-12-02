@@ -313,7 +313,7 @@ to `stdout`.
 | Day | Name            | Problem                                      | Solution        | Stars |
 |----:|:----------------|:---------------------------------------------|:----------------|:------|
 |   1 | Secret Entrance | [link](https://adventofcode.com/2025/day/1)  | [link](2025/1)  | ★★    |
-|   2 |                 | [link](https://adventofcode.com/2025/day/2)  | [link](2025/2)  |       |
+|   2 | Gift Shop       | [link](https://adventofcode.com/2025/day/2)  | [link](2025/2)  | ★★    |
 |   3 |                 | [link](https://adventofcode.com/2025/day/3)  | [link](2025/3)  |       |
 |   4 |                 | [link](https://adventofcode.com/2025/day/4)  | [link](2025/4)  |       |
 |   5 |                 | [link](https://adventofcode.com/2025/day/5)  | [link](2025/5)  |       |

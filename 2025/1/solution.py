@@ -11,7 +11,10 @@ def main():
 
     for line in sys.stdin:
         if match := re.match(r'^([LR])(\d+)$', line):
-            direction, rotation = -1 if match.group(1) == 'L' else 1, int(match.group(2))
+            direction, rotation = (
+                -1 if match.group(1) == 'L' else 1,
+                int(match.group(2)),
+            )
             position += direction * rotation
 
             if rotation == 0:
