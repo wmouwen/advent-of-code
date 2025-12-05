@@ -316,7 +316,7 @@ to `stdout`.
 |   2 | Gift Shop           | [link](https://adventofcode.com/2025/day/2)  | [link](2025/2)  | ★★    |
 |   3 | Lobby               | [link](https://adventofcode.com/2025/day/3)  | [link](2025/3)  | ★★    |
 |   4 | Printing Department | [link](https://adventofcode.com/2025/day/4)  | [link](2025/4)  | ★★    |
-|   5 |                     | [link](https://adventofcode.com/2025/day/5)  | [link](2025/5)  |       |
+|   5 | Cafetaria           | [link](https://adventofcode.com/2025/day/5)  | [link](2025/5)  | ★★    |
 |   6 |                     | [link](https://adventofcode.com/2025/day/6)  | [link](2025/6)  |       |
 |   7 |                     | [link](https://adventofcode.com/2025/day/7)  | [link](2025/7)  |       |
 |   8 |                     | [link](https://adventofcode.com/2025/day/8)  | [link](2025/8)  |       |
