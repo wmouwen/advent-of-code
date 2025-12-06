@@ -317,7 +317,7 @@ to `stdout`.
 |   3 | Lobby               | [link](https://adventofcode.com/2025/day/3)  | [link](2025/3)  | ★★    |
 |   4 | Printing Department | [link](https://adventofcode.com/2025/day/4)  | [link](2025/4)  | ★★    |
 |   5 | Cafetaria           | [link](https://adventofcode.com/2025/day/5)  | [link](2025/5)  | ★★    |
-|   6 |                     | [link](https://adventofcode.com/2025/day/6)  | [link](2025/6)  |       |
+|   6 | Trash Compactor     | [link](https://adventofcode.com/2025/day/6)  | [link](2025/6)  | ★     |
 |   7 |                     | [link](https://adventofcode.com/2025/day/7)  | [link](2025/7)  |       |
 |   8 |                     | [link](https://adventofcode.com/2025/day/8)  | [link](2025/8)  |       |
 |   9 |                     | [link](https://adventofcode.com/2025/day/9)  | [link](2025/9)  |       |
