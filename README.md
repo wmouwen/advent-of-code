@@ -319,7 +319,7 @@ to `stdout`.
 |   5 | Cafetaria           | [link](https://adventofcode.com/2025/day/5)  | [link](2025/5)  | ★★    |
 |   6 | Trash Compactor     | [link](https://adventofcode.com/2025/day/6)  | [link](2025/6)  | ★★    |
 |   7 | Laboratories        | [link](https://adventofcode.com/2025/day/7)  | [link](2025/7)  | ★★    |
-|   8 |                     | [link](https://adventofcode.com/2025/day/8)  | [link](2025/8)  |       |
+|   8 | Playground          | [link](https://adventofcode.com/2025/day/8)  | [link](2025/8)  | ★★    |
 |   9 |                     | [link](https://adventofcode.com/2025/day/9)  | [link](2025/9)  |       |
 |  10 |                     | [link](https://adventofcode.com/2025/day/10) | [link](2025/10) |       |
 |  11 |                     | [link](https://adventofcode.com/2025/day/11) | [link](2025/11) |       |
