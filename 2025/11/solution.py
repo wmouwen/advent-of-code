@@ -13,8 +13,6 @@ def find_paths(edges: dict[str, set[str]], source: str, sink: str) -> list[list[
     while not queue.empty():
         node, path = queue.get()
 
-        print(queue.qsize())
-
         for neighbor in edges[node]:
             if neighbor == sink:
                 paths.append(path + [sink])
